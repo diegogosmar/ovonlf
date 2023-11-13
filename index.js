@@ -17,8 +17,8 @@ var jsonArray = [];
 // Store the received JSON data
 let storedJsonData = null;
 
-// app.post START
-app.post('/data',(req, res) => {
+// app.post START on /welcome endpoint
+app.post('/welcome',(req, res) => {
     const data = req.body;
 
     // Store the received JSON data
@@ -88,8 +88,8 @@ res.status(201).send(jsonString);
 }); 
 // app.post END
 
-// Define the route for handling GET requests to '/data'
-app.get('/data', (req, res) => {
+// Define the route for handling GET requests to '/welcome'
+app.get('/welcome', (req, res) => {
     // Check if there is stored JSON data
     //if (storedJsonData) {
       // Convert the stored JSON data to a string
