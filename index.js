@@ -101,7 +101,7 @@ app.get('/data', (req, res) => {
       // If no data is stored, send an appropriate response
       // For the moment do not allow this method
       res.status(404).send('Method Not Allowed');
-    }
+   // }
   });
   
 
