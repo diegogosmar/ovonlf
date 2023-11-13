@@ -6,10 +6,11 @@ const app = express();
 app.use(bodyParser.json());
 
 // Set variable convid to the local timestamp
-//var convid = new Date().getTime();
+//var timest_id = new Date().getTime();
+var timest = new Date().toLocaleString();
 
 // Concatenate "conv_" before the timestamp
-//var formattedTimestamp = "conv_" + convid;
+//var formattedTimestamp = "conv_" + timest;
 
 // Create an array to store objects
 var jsonArray = [];
@@ -34,15 +35,23 @@ app.post('/welcome',(req, res) => {
     console.log('Array set to:', jsonArray);
 
     const ovonConversationId = data.ovon.conversation.id;
+	const ovonevent = data.ovon.events;
 
  // Now ovonConversationId contains the value of ovon.conversation.id
     console.log("ovonConversationId:", ovonConversationId);
+	console.log("ovoneventType:", ovonevent);
 
- // Create the JSON object for the POST RESPONSE
-var myJson = {
+// Check if data.ovon.events contains the eventType named "whisper"
+    const hasWhisperEventType = data.ovon.events.some(event => event.eventType === "whisper");
+
+// Create the JSON object for the POST RESPONSE
+// Set myJson based on the condition
+myJson = hasWhisperEventType
+? {
+    // Set your primary structure here
+
 	"ovon": {
 		"conversation": {
-//			"id": formattedTimestamp
             "id": ovonConversationId
 		},
 		"sender": {
@@ -56,7 +65,45 @@ var myJson = {
 					"dialogEvent": {
 						"speakerId": "assistant",
 						"span": {
-							"startTime": "2023-11-09 15:24:05"
+							"startTime": timest
+						},
+						"features": {
+							"text": {
+								"mimeType": "text/plain",
+								"tokens": [
+									{
+										"value": "Oscar Wilde is the author of many books!"
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		]
+	}
+
+  }
+
+: {
+	// Set your alternative structure here
+
+	"ovon": {
+		"conversation": {
+            "id": ovonConversationId
+		},
+		"sender": {
+			"from": "browser"
+		},
+		"responseCode": 200,
+		"events": [
+			{
+				"eventType": "utterance",
+				"parameters": {
+					"dialogEvent": {
+						"speakerId": "assistant",
+						"span": {
+							"startTime": timest
 						},
 						"features": {
 							"text": {
@@ -73,7 +120,9 @@ var myJson = {
 			}
 		]
 	}
-};
+
+  };
+
 
 // Convert the JSON object to a string for display or transmission
 var jsonString = JSON.stringify(myJson);
