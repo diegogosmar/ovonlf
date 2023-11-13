@@ -91,15 +91,16 @@ res.status(201).send(jsonString);
 // Define the route for handling GET requests to '/data'
 app.get('/data', (req, res) => {
     // Check if there is stored JSON data
-    if (storedJsonData) {
+    //if (storedJsonData) {
       // Convert the stored JSON data to a string
-      const jsonStringGet = JSON.stringify(storedJsonData);
+      //const jsonStringGet = JSON.stringify(storedJsonData);
   
       // Send the JSON data as the response
-      res.status(200).send(jsonStringGet);
-    } else {
+      //res.status(200).send(jsonStringGet);
+   // } else {
       // If no data is stored, send an appropriate response
-      res.status(404).send('No data available.');
+      // For the moment do not allow this method
+      res.status(404).send('Method Not Allowed');
     }
   });
   
