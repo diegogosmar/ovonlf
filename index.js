@@ -5,6 +5,8 @@ const app = express();
 //app.use(express.json());
 app.use(bodyParser.json());
 
+const fetch = require('node-fetch');
+
 // Set variable convid to the local timestamp
 //var timest_id = new Date().getTime();
 var timest = new Date().toLocaleString();
