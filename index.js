@@ -18,127 +18,139 @@ var jsonArray = [];
 // Store the received JSON data
 let storedJsonData = null;
 
-// app.post START on /welcome endpoint
-app.post('/welcome',(req, res) => {
-    const data = req.body;
-
-    // Store the received JSON data
-    storedJsonData = data;
-
-    // Push the given JSON object into the array
-    jsonArray.push(data);
-    
- // Log the received POST REQUEST to the console
-    console.log('Received JSON data:', data);
-
- // Log the resulting array to the console
-    console.log('Array set to:', jsonArray);
-
-    const ovonConversationId = data.ovon.conversation.id;
-	const ovonevent = data.ovon.events;
-
- // Now ovonConversationId contains the value of ovon.conversation.id
-    console.log("ovonConversationId:", ovonConversationId);
-	console.log("ovoneventType:", ovonevent);
-
-// Check if data.ovon.events contains the eventType named "whisper"
-    const hasWhisperEventType = data.ovon.events.some(event => event.eventType === "whisper");
-
-// Create the JSON object for the POST RESPONSE
-// Set myJson based on the condition
-myJson = hasWhisperEventType
-? {
-    // Set your primary structure here
-
-	"ovon": {
-		"conversation": {
-            "id": ovonConversationId
-		},
-		"sender": {
-			"from": "browser"
-		},
-		"responseCode": 200,
-		"events": [
-			{
-				"eventType": "utterance",
-				"parameters": {
-					"dialogEvent": {
-						"speakerId": "assistant",
-						"span": {
-							"startTime": timest
-						},
-						"features": {
-							"text": {
-								"mimeType": "text/plain",
-								"tokens": [
-									{
-										"value": "Oscar Wilde is the author of many books!"
-									}
-								]
-							}
-						}
-					}
-				}
-			}
-		]
-	}
-
+// Define the fetchData function
+function fetchData(isbnValue) {
+	const apiUrl = `https://openlibrary.org/isbn/${isbnValue}.json`;
+  
+	return fetch(apiUrl)
+	  .then(response => {
+		if (!response.ok) {
+		  throw new Error(`HTTP error! Status: ${response.status}`);
+		}
+		return response.json();
+	  })
+	  .then(data => {
+		return JSON.stringify(data); // Stringify the data
+	  });
   }
-
-: {
-	// Set your alternative structure here
-
-	"ovon": {
-		"conversation": {
-            "id": ovonConversationId
-		},
-		"sender": {
-			"from": "browser"
-		},
-		"responseCode": 200,
-		"events": [
-			{
-				"eventType": "utterance",
-				"parameters": {
-					"dialogEvent": {
-						"speakerId": "assistant",
-						"span": {
-							"startTime": timest
-						},
-						"features": {
-							"text": {
-								"mimeType": "text/plain",
-								"tokens": [
-									{
-										"value": "Welcome to the OVON EU Authorship Library service! WHISPER me any Author Name please, and I'll recover some book infos for you!"
-									}
-								]
-							}
-						}
+  
+  // app.post START on /smartlibrary endpoint
+  app.post('/smartlibrary', async (req, res) => {
+	try {
+	  const data = req.body;
+	  storedJsonData = data;
+	  jsonArray.push(data);
+  
+	  console.log('Received JSON data:', data);
+	  console.log('Array set to:', jsonArray);
+  
+	  const ovonConversationId = data.ovon.conversation.id;
+	  const ovonevent = data.ovon.events;
+  
+	  console.log("ovonConversationId:", ovonConversationId);
+	  console.log("ovoneventType:", ovonevent);
+  
+	  // Check if data.ovon.events contains the eventType named "whisper"
+	  const hasWhisperEventType = data.ovon.events.some(event => event.eventType === "whisper");
+  
+	  // Fetch data if the condition is met
+	  let stringifiedData = "";
+	  if (hasWhisperEventType) {
+		const isbnToken = data.ovon.events.find(event => event.eventType === "whisper").parameters.dialogEvent.features.text.tokens[0];
+		const isbnValue = isbnToken && isbnToken.ISBN_value;
+  
+		if (isbnValue) {
+		  stringifiedData = await fetchData(isbnValue);
+		  console.log("Stringified Data:", stringifiedData);
+		} else {
+		  console.log("ISBN_value not found in the JSON.");
+		}
+	  }
+  
+	  // Create the JSON object for the POST RESPONSE
+	  const myJson = hasWhisperEventType
+		? {
+		  ovon: {
+			conversation: {
+			  id: ovonConversationId
+			},
+			sender: {
+			  from: "Smart Library APIs"
+			},
+			responseCode: 200,
+			events: [
+			  {
+				eventType: "utterance",
+				parameters: {
+				  dialogEvent: {
+					speakerId: "assistant",
+					span: {
+					  startTime: new Date().toISOString()
+					},
+					features: {
+					  json: {
+						mimeType: "application/json",
+						tokens: [{ value: stringifiedData }]
+					  }
 					}
+				  }
 				}
-			}
-		]
+			  }
+			]
+		  }
+		}
+		: {
+		  ovon: {
+			conversation: {
+			  id: ovonConversationId
+			},
+			sender: {
+			  from: "browser"
+			},
+			responseCode: 200,
+			events: [
+			  {
+				eventType: "utterance",
+				parameters: {
+				  dialogEvent: {
+					speakerId: "assistant",
+					span: {
+					  startTime: new Date().toISOString()
+					},
+					features: {
+					  text: {
+						mimeType: "text/plain",
+						tokens: [
+						  {
+							value: "Welcome to the OVON EU Authorship Library service! WHISPER me any valid Book ISBN code please, and I'll recover some book info for you!"
+						  }
+						]
+					  }
+					}
+				  }
+				}
+			  }
+			]
+		  }
+		};
+  
+	  // Convert the JSON object to a string for display or transmission
+	  const jsonString = JSON.stringify(myJson);
+  
+	  // Log the result to the console
+	  console.log(jsonString);
+  
+	  // Send the jsonString as POST RESPONSE
+	  res.status(201).send(jsonString);
+	} catch (error) {
+	  console.error('Error:', error);
+	  res.status(500).send('Internal Server Error');
 	}
+  });
+// POST Management END
 
-  };
-
-
-// Convert the JSON object to a string for display or transmission
-var jsonString = JSON.stringify(myJson);
-
-// Log the result to the console
-console.log(jsonString);   
-
- // Send the jsonString as POST RESPONSE
-res.status(201).send(jsonString);
-
- //   return;
-}); 
-// app.post END
-
-// Define the route for handling GET requests to '/welcome'
-app.get('/welcome', (req, res) => {
+// Define the route for handling GET requests to '/smartlibrary'
+app.get('/smartlibrary', (req, res) => {
     // Check if there is stored JSON data
     //if (storedJsonData) {
       // Convert the stored JSON data to a string
