@@ -63,7 +63,7 @@ var myJson = {
 								"mimeType": "text/plain",
 								"tokens": [
 									{
-										"value": "Thanks for the invitation, I am ready to assist!"
+										"value": "Welcome to the OVON EU service!"
 									}
 								]
 							}
