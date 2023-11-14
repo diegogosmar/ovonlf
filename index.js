@@ -1,3 +1,4 @@
+const http = require('http');
 const https = require('https');
 const fs = require('fs');
 
@@ -9,6 +10,15 @@ const app = express();
 app.use(bodyParser.json());
 
 const fetch = require('node-fetch');
+
+// Redirect HTTP to HTTPS
+app.use((req, res, next) => {
+	if (req.protocol === 'http') {
+	  res.redirect(301, `https://${req.headers.host}${req.url}`);
+	} else {
+	  next();
+	}
+  });
 
 // Set variable convid to the local timestamp
 //var timest_id = new Date().getTime();
@@ -46,14 +56,14 @@ function fetchData(isbnValue) {
 	  storedJsonData = data;
 	  jsonArray.push(data);
   
-	  console.log('Received JSON data:', data);
-	  console.log('Array set to:', jsonArray);
+	  //console.log('Received JSON data:', data);
+	  //console.log('Array set to:', jsonArray);
   
 	  const ovonConversationId = data.ovon.conversation.id;
 	  const ovonevent = data.ovon.events;
   
-	  console.log("ovonConversationId:", ovonConversationId);
-	  console.log("ovoneventType:", ovonevent);
+	  //console.log("ovonConversationId:", ovonConversationId);
+	  //console.log("ovoneventType:", ovonevent);
   
 	  // Check if data.ovon.events contains the eventType named "whisper"
 	  const hasWhisperEventType = data.ovon.events.some(event => event.eventType === "whisper");
@@ -66,9 +76,9 @@ function fetchData(isbnValue) {
   
 		if (isbnValue) {
 		  stringifiedData = await fetchData(isbnValue);
-		  console.log("Stringified Data:", stringifiedData);
+		  //console.log("Stringified Data:", stringifiedData);
 		} else {
-		  console.log("ISBN_value not found in the JSON.");
+		  //console.log("ISBN_value not found in the JSON.");
 		}
 	  }
   
@@ -143,12 +153,12 @@ function fetchData(isbnValue) {
 	  const jsonString = JSON.stringify(myJson);
   
 	  // Log the result to the console
-	  console.log(jsonString);
+	  //console.log(jsonString);
   
 	  // Send the jsonString as POST RESPONSE
 	  res.status(201).send(jsonString);
 	} catch (error) {
-	  console.error('Error:', error);
+	  //console.error('Error:', error);
 	  res.status(500).send('Internal Server Error');
 	}
   });
@@ -170,22 +180,29 @@ app.get('/smartlibrary', (req, res) => {
    // }
   });
   
-  
+//Use this in case of certificates not available
 //PORT = 8080
 
 //app.listen({port:PORT},() => {
 //    console.log('Server is running');
 //});
 
-const options = {
-	key: fs.readFileSync('../certificates/your_key.pem'),
-	cert: fs.readFileSync('../certificates/your_cert.pem'),
-  };
-  
-  const PORT = 443;
-  
-  const server = https.createServer(options, app);
-  
-  server.listen(PORT, () => {
-	console.log(`Server running on https://yourdomain:${PORT}`);
-  });
+const httpServer = http.createServer(app);
+const httpsOptions = {
+  key: fs.readFileSync('../certificates/your_key.pem'),
+  cert: fs.readFileSync('../certificates/your_cert.pem'),
+};
+const httpsServer = https.createServer(httpsOptions, app);
+
+const HTTP_PORT = 80;
+const HTTPS_PORT = 443;
+
+// HTTP server
+httpServer.listen(HTTP_PORT, () => {
+  console.log(`HTTP server running on http://yourdomain:${HTTP_PORT}`);
+});
+
+// HTTPS server
+httpsServer.listen(HTTPS_PORT, () => {
+  console.log(`HTTPS server running on https://yourdomain:${HTTPS_PORT}`);
+});
