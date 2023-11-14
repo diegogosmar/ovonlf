@@ -20,6 +20,14 @@ app.use((req, res, next) => {
 	}
   });
 
+  // Enable CORS for all routes
+app.use((req, res, next) => {
+	res.header('Access-Control-Allow-Origin', '*'); // You can replace '*' with your specific allowed origin
+	res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+	next();
+  });
+  
 // Set variable convid to the local timestamp
 //var timest_id = new Date().getTime();
 var timest = new Date().toLocaleString();
