@@ -137,7 +137,7 @@ function fetchData(isbnValue) {
 						mimeType: "text/plain",
 						tokens: [
 						  {
-							value: "Welcome to the OVON Smart Library service! WHISPER me any valid Book ISBN code please, and I'll recover many book info for you!"
+							value: "Welcome to the OVON Smart Library service! I can look up information about books if you provide a valid ISBN number."
 						  }
 						]
 					  }
