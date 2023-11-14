@@ -72,7 +72,7 @@ function fetchData(isbnValue) {
 	  let stringifiedData = "";
 	  if (hasWhisperEventType) {
 		const isbnToken = data.ovon.events.find(event => event.eventType === "whisper").parameters.dialogEvent.features.text.tokens[0];
-		const isbnValue = isbnToken && isbnToken.ISBN_value;
+		const isbnValue = isbnToken && isbnToken.value;
   
 		if (isbnValue) {
 		  stringifiedData = await fetchData(isbnValue);
