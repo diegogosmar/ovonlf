@@ -20,6 +20,10 @@ app.use((req, res, next) => {
 	}
   });
 
+  const cors = require('cors');
+  const PORT = 443; // Change to your desired HTTPS port
+  app.use(cors());
+
   // Enable CORS for all routes
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*'); // You can replace '*' with your specific allowed origin
@@ -27,7 +31,7 @@ app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
 	next();
   });
-  
+
 // Set variable convid to the local timestamp
 //var timest_id = new Date().getTime();
 var timest = new Date().toLocaleString();
