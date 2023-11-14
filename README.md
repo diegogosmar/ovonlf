@@ -1,7 +1,7 @@
 # Smart Library Service
-## A Universal API example with Message Envelopes
+## A Universal API example using OVON Message Envelopes
 =======
-### Open Voice Network, Linux Foundation AI & Data
+#### Open Voice Network, Linux Foundation AI & Data
 
 The purpose of this APIs is to supports some interaction responses via standard POST messages compatible with the OVON Interoperable Conversation Envelope Specification, in order to provide an example of book information agent.
 
