@@ -189,8 +189,11 @@ app.get('/smartlibrary', (req, res) => {
 
 const httpServer = http.createServer(app);
 const httpsOptions = {
-  key: fs.readFileSync('../certificates/your_key.pem'),
-  cert: fs.readFileSync('../certificates/your_cert.pem'),
+  key: fs.readFileSync('../certificates/your_key.key'),
+  cert: fs.readFileSync('../certificates/your_cert.crt'),
+  //Use the following instead, in case of self-certificates
+  //key: fs.readFileSync('path/to/your_key.pem'),
+  //cert: fs.readFileSync('path/to/your_cert.pem'),
 };
 const httpsServer = https.createServer(httpsOptions, app);
 
