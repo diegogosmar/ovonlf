@@ -1,8 +1,7 @@
-<<<<<<< HEAD
-# ovon
-Open Voice Network
+# Smart Library Service
+## A Universal API example with Message Envelopes
 =======
-# Open Voice Network
+## Open Voice Network, Linux Foundation AI & Data
 
 POST endpoint testing for Conversational AI message envelop standardization
->>>>>>> 33b9bd7 (Initial commit)
+
