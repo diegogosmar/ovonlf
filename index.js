@@ -1,3 +1,6 @@
+const https = require('https');
+const fs = require('fs');
+
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -167,7 +170,22 @@ app.get('/smartlibrary', (req, res) => {
    // }
   });
   
+  
+//PORT = 8080
 
-app.listen({port:8080},() => {
-    console.log('Server is running');
-});
+//app.listen({port:PORT},() => {
+//    console.log('Server is running');
+//});
+
+const options = {
+	key: fs.readFileSync('../certificates/your_key.pem'),
+	cert: fs.readFileSync('../certificates/your_cert.pem'),
+  };
+  
+  const PORT = 443;
+  
+  const server = https.createServer(options, app);
+  
+  server.listen(PORT, () => {
+	console.log(`Server running on https://yourdomain:${PORT}`);
+  });
