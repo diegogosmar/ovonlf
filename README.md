@@ -104,20 +104,21 @@ Potter
 
 ###Miscellaneus
 
-Setup your self-certificate, to have the node.js code working properly with https:
+Setup your self-certificate, to have the node.js code working properly with https:<br>
+<br>
+cd path/to/your/directory<br>
+openssl genpkey -algorithm RSA -out your_key.pem<br>
+openssl req -new -key your_key.pem -out your_csr.pem<br>
+openssl x509 -req -in your_csr.pem -signkey your_key.pem -out your_cert.pem<br>
 
-cd path/to/your/directory
-openssl genpkey -algorithm RSA -out your_key.pem
-openssl req -new -key your_key.pem -out your_csr.pem
-openssl x509 -req -in your_csr.pem -signkey your_key.pem -out your_cert.pem
-
-node.js important packages to be installed (i.e. on Debian):
-
-sudo apt update
-sudo apt install nodejs
-sudo apt install npm
-
-npm i express
-npm install express body-parser
-npm install -g pm2
-npm install node-fetch@2
+node.js important packages to be installed (i.e. on Debian):<br>
+<br>
+sudo apt update<br>
+sudo apt install nodejs<br>
+sudo apt install npm<br>
+<br>
+npm i express<br>
+npm install express body-parser<br>
+npm install -g pm2<br>
+npm install node-fetch@2<br>
+npm install cors<br>
