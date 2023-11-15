@@ -74,9 +74,6 @@ function fetchData(isbnValue) {
 	  const ovonConversationId = data.ovon.conversation.id;
 	  const ovonevent = data.ovon.events;
   
-	  //console.log("ovonConversationId:", ovonConversationId);
-	  //console.log("ovoneventType:", ovonevent);
-  
 	  // Check if data.ovon.events contains the eventType named "whisper"
 	  const hasWhisperEventType = data.ovon.events.some(event => event.eventType === "whisper");
   
