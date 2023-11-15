@@ -68,7 +68,6 @@ function fetchData(isbnValue) {
 	  storedJsonData = data;
 	  jsonArray.push(data);
   
-	  //console.log('Received JSON data:', data);
 	  //console.log('Array set to:', jsonArray);
   
 	  const ovonConversationId = data.ovon.conversation.id;
