@@ -9,6 +9,8 @@ const app = express();
 //app.use(express.json());
 app.use(bodyParser.json());
 
+//test die
+
 const fetch = require('node-fetch');
 
 // Redirect HTTP to HTTPS
