@@ -1,10 +1,10 @@
 const fetch = require('node-fetch');
-const fs = require('fs').promises; // File system module for reading files
+const fs = require('fs').promises;
 
 async function getApiKey() {
     try {
         const key = await fs.readFile('../API_Hug.key', 'utf8');
-        return key.trim(); // Trim whitespace
+        return key.trim();
     } catch (error) {
         console.error('Error reading API key file:', error);
         return null;
@@ -49,7 +49,6 @@ async function queryModel(prompt, apiKey) {
     }
 }
 
-// Example prompt
 const messages = [
     {
         "role": "system",
@@ -59,11 +58,21 @@ const messages = [
 ];
 const prompt = messages.map(msg => `${msg.role}: ${msg.content}`).join('\n');
 
-// Query the model using the API key from file
+let modelResponse = '';
+let modelResponseAssistant = '';
+
 getApiKey().then(apiKey => {
     if (apiKey) {
         queryModel(prompt, apiKey)
-            .then(response => console.log(response))
+            .then(response => {
+                console.log(response);
+                modelResponse = response;
+                
+                const assistantResponseStart = response.lastIndexOf("assistant:") + "assistant:".length;
+                modelResponseAssistant = response.substring(assistantResponseStart).trim();
+
+                console.log("Assistant's Response:", modelResponseAssistant);
+            })
             .catch(error => console.error(error));
     }
 }).catch(error => console.error('Error with API key:', error));
