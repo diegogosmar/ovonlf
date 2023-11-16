@@ -1,0 +1,69 @@
+const fetch = require('node-fetch');
+const fs = require('fs').promises; // File system module for reading files
+
+async function getApiKey() {
+    try {
+        const key = await fs.readFile('../API_Hug.key', 'utf8');
+        return key.trim(); // Trim whitespace
+    } catch (error) {
+        console.error('Error reading API key file:', error);
+        return null;
+    }
+}
+
+const model = 'HuggingFaceH4/zephyr-7b-beta';
+
+async function queryModel(prompt, apiKey) {
+    const url = `https://api-inference.huggingface.co/models/${model}`;
+    const headers = {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+    };
+    const data = {
+        inputs: prompt,
+        options: {
+            max_new_tokens: 256,
+            do_sample: true,
+            temperature: 0.7,
+            top_k: 50,
+            top_p: 0.95
+        }
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status}`);
+        }
+
+        const result = await response.json();
+        return result[0].generated_text;
+    } catch (error) {
+        console.error('Error querying model:', error);
+        return null;
+    }
+}
+
+// Example prompt
+const messages = [
+    {
+        "role": "system",
+        "content": "You are a knowledgeable chatbot.",
+    },
+    {"role": "user", "content": "Who wrote Harry Potter?"}
+];
+const prompt = messages.map(msg => `${msg.role}: ${msg.content}`).join('\n');
+
+// Query the model using the API key from file
+getApiKey().then(apiKey => {
+    if (apiKey) {
+        queryModel(prompt, apiKey)
+            .then(response => console.log(response))
+            .catch(error => console.error(error));
+    }
+}).catch(error => console.error('Error with API key:', error));
