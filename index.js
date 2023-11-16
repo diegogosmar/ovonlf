@@ -1,3 +1,8 @@
+// Smart Library OVON universal API examples //
+// Diego Gosmar - 2023, 2024 //
+// The purpose of this APIs is to supports some interaction responses via standard POST messages compatible with the //
+// OVON Interoperable Conversation Envelope Specification, in order to provide an example of book information agent. //
+
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
