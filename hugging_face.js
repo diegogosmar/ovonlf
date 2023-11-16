@@ -49,30 +49,37 @@ async function queryModel(prompt, apiKey) {
     }
 }
 
-const messages = [
-    {
-        "role": "system",
-        "content": "You are a knowledgeable chatbot.",
-    },
-    {"role": "user", "content": "Who wrote Harry Potter?"}
-];
-const prompt = messages.map(msg => `${msg.role}: ${msg.content}`).join('\n');
+async function askModel(question) {
+    const messages = [
+        {
+            "role": "system",
+            "content": "You are a knowledgeable chatbot.",
+        },
+        {"role": "user", "content": question}
+    ];
+    const prompt = messages.map(msg => `${msg.role}: ${msg.content}`).join('\n');
 
-let modelResponse = '';
-let modelResponseAssistant = '';
+    try {
+        const apiKey = await getApiKey();
+        if (!apiKey) {
+            throw new Error('API key is not available');
+        }
 
-getApiKey().then(apiKey => {
-    if (apiKey) {
-        queryModel(prompt, apiKey)
-            .then(response => {
-                console.log(response);
-                modelResponse = response;
-                
-                const assistantResponseStart = response.lastIndexOf("assistant:") + "assistant:".length;
-                modelResponseAssistant = response.substring(assistantResponseStart).trim();
+        const fullResponse = await queryModel(prompt, apiKey);
+        const assistantResponseStart = fullResponse.lastIndexOf("assistant:") + "assistant:".length;
+        const assistantResponse = fullResponse.substring(assistantResponseStart).trim();
 
-                console.log("Assistant's Response:", modelResponseAssistant);
-            })
-            .catch(error => console.error(error));
+        return { fullResponse, assistantResponse };
+    } catch (error) {
+        console.error('Error in askModel function:', error);
+        return { fullResponse: null, assistantResponse: null };
     }
-}).catch(error => console.error('Error with API key:', error));
+}
+
+// Example usage of the function
+askModel("Who wrote Harry Potter?")
+    .then(({ fullResponse, assistantResponse }) => {
+        console.log("Full Response:", fullResponse);
+        console.log("Assistant's Response:", assistantResponse);
+    })
+    .catch(error => console.error(error));
