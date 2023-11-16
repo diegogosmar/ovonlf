@@ -76,10 +76,4 @@ async function askModel(question) {
     }
 }
 
-// Example usage of the function
-askModel("Who wrote Harry Potter?")
-    .then(({ fullResponse, assistantResponse }) => {
-        console.log("Full Response:", fullResponse);
-        console.log("Assistant's Response:", assistantResponse);
-    })
-    .catch(error => console.error(error));
+module.exports = { askModel };

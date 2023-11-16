@@ -1,11 +1,43 @@
+// Smart Library OVON universal API examples //
+// Diego Gosmar - 2023, 2024 //
+// The purpose of this APIs is to supports some interaction responses via standard POST messages compatible with the //
+// OVON Interoperable Conversation Envelope Specification, in order to provide an example of book information agent. //
+
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+
 const express = require('express');
 const bodyParser = require('body-parser');
+
+const { askModel } = require('./hugging_face'); // Adjust the path if necessary
 
 const app = express();
 //app.use(express.json());
 app.use(bodyParser.json());
 
 const fetch = require('node-fetch');
+
+// Redirect HTTP to HTTPS
+app.use((req, res, next) => {
+	if (req.protocol === 'http') {
+	  res.redirect(301, `https://${req.headers.host}${req.url}`);
+	} else {
+	  next();
+	}
+  });
+
+  const cors = require('cors');
+  const PORT = 443; // Change to your desired HTTPS port
+  app.use(cors());
+
+  // Enable CORS for all routes
+app.use((req, res, next) => {
+	res.header('Access-Control-Allow-Origin', '*'); // You can replace '*' with your specific allowed origin
+	res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+	next();
+  });
 
 // Set variable convid to the local timestamp
 //var timest_id = new Date().getTime();
@@ -43,14 +75,10 @@ function fetchData(isbnValue) {
 	  storedJsonData = data;
 	  jsonArray.push(data);
   
-	  console.log('Received JSON data:', data);
-	  console.log('Array set to:', jsonArray);
+	  //console.log('Array set to:', jsonArray);
   
 	  const ovonConversationId = data.ovon.conversation.id;
 	  const ovonevent = data.ovon.events;
-  
-	  console.log("ovonConversationId:", ovonConversationId);
-	  console.log("ovoneventType:", ovonevent);
   
 	  // Check if data.ovon.events contains the eventType named "whisper"
 	  const hasWhisperEventType = data.ovon.events.some(event => event.eventType === "whisper");
@@ -59,13 +87,13 @@ function fetchData(isbnValue) {
 	  let stringifiedData = "";
 	  if (hasWhisperEventType) {
 		const isbnToken = data.ovon.events.find(event => event.eventType === "whisper").parameters.dialogEvent.features.text.tokens[0];
-		const isbnValue = isbnToken && isbnToken.ISBN_value;
+		const isbnValue = isbnToken && isbnToken.value;
   
 		if (isbnValue) {
 		  stringifiedData = await fetchData(isbnValue);
-		  console.log("Stringified Data:", stringifiedData);
+		  //console.log("Stringified Data:", stringifiedData);
 		} else {
-		  console.log("ISBN_value not found in the JSON.");
+		  //console.log("ISBN_value not found in the JSON.");
 		}
 	  }
   
@@ -124,7 +152,7 @@ function fetchData(isbnValue) {
 						mimeType: "text/plain",
 						tokens: [
 						  {
-							value: "Welcome to the OVON EU Authorship Library service! WHISPER me any valid Book ISBN code please, and I'll recover some book info for you!"
+							value: "Welcome to the OVON Smart Library service! I can look up information about books if you provide a valid ISBN number."
 						  }
 						]
 					  }
@@ -140,12 +168,12 @@ function fetchData(isbnValue) {
 	  const jsonString = JSON.stringify(myJson);
   
 	  // Log the result to the console
-	  console.log(jsonString);
+	  //console.log(jsonString);
   
 	  // Send the jsonString as POST RESPONSE
 	  res.status(201).send(jsonString);
 	} catch (error) {
-	  console.error('Error:', error);
+	  //console.error('Error:', error);
 	  res.status(500).send('Internal Server Error');
 	}
   });
@@ -167,9 +195,32 @@ app.get('/smartlibrary', (req, res) => {
    // }
   });
   
-  
-PORT = 8080
+//Use this in case of certificates not available
+//PORT = 8080
 
-app.listen({port:PORT},() => {
-    console.log('Server is running');
+//app.listen({port:PORT},() => {
+//    console.log('Server is running');
+//});
+
+const httpServer = http.createServer(app);
+const httpsOptions = {
+  key: fs.readFileSync('../certificates/your_key.key'),
+  cert: fs.readFileSync('../certificates/your_cert.crt'),
+  //Use the following instead, in case of self-certificates
+  //key: fs.readFileSync('path/to/your_key.pem'),
+  //cert: fs.readFileSync('path/to/your_cert.pem'),
+};
+const httpsServer = https.createServer(httpsOptions, app);
+
+const HTTP_PORT = 80;
+const HTTPS_PORT = 443;
+
+// HTTP server
+httpServer.listen(HTTP_PORT, () => {
+  console.log(`HTTP server running on http://yourdomain:${HTTP_PORT}`);
+});
+
+// HTTPS server
+httpsServer.listen(HTTPS_PORT, () => {
+  console.log(`HTTPS server running on https://yourdomain:${HTTPS_PORT}`);
 });

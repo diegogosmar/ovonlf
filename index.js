@@ -10,6 +10,8 @@ const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const { askModel } = require('./hugging_face'); // Adjust the path if necessary
+
 const app = express();
 //app.use(express.json());
 app.use(bodyParser.json());
@@ -36,6 +38,7 @@ app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
 	next();
   });
+
 
 // Set variable convid to the local timestamp
 //var timest_id = new Date().getTime();
@@ -77,103 +80,185 @@ function fetchData(isbnValue) {
   
 	  const ovonConversationId = data.ovon.conversation.id;
 	  const ovonevent = data.ovon.events;
-  
-	  // Check if data.ovon.events contains the eventType named "whisper"
-	  const hasWhisperEventType = data.ovon.events.some(event => event.eventType === "whisper");
-  
-	  // Fetch data if the condition is met
-	  let stringifiedData = "";
-	  if (hasWhisperEventType) {
+
+	// Check if data.ovon.events contains the eventType named "whisper"
+	const hasWhisperEventType = data.ovon.events.some(event => event.eventType === "whisper");
+	console.log('Has Whisper:', hasWhisperEventType);
+
+    // Check if data.ovon.events contains the eventType named "utterance"
+    const hasUtteranceEventType = data.ovon.events.some(event => event.eventType === "utterance");
+	console.log('Has Utterance:', hasUtteranceEventType);
+
+	  // Fetch data if ONLY the condition for WHISPER is met (intended for pure ISBN queries) 
+	  let stringifiedDataWhisper = "";
+	if (hasWhisperEventType && !hasUtteranceEventType) {
 		const isbnToken = data.ovon.events.find(event => event.eventType === "whisper").parameters.dialogEvent.features.text.tokens[0];
 		const isbnValue = isbnToken && isbnToken.value;
   
 		if (isbnValue) {
-		  stringifiedData = await fetchData(isbnValue);
-		  //console.log("Stringified Data:", stringifiedData);
+		  stringifiedDataWhisper = await fetchData(isbnValue);
+		  //console.log("isbnValue Data:", stringifiedDataWhisper);
 		} else {
 		  //console.log("ISBN_value not found in the JSON.");
 		}
-	  }
-  
-	  // Create the JSON object for the POST RESPONSE
-	  const myJson = hasWhisperEventType
-		? {
-		  ovon: {
-			conversation: {
-			  id: ovonConversationId
-			},
-			sender: {
-			  from: "Smart Library APIs"
-			},
-			responseCode: 200,
-			events: [
-			  {
-				eventType: "utterance",
-				parameters: {
-				  dialogEvent: {
-					speakerId: "assistant",
-					span: {
-					  startTime: new Date().toISOString()
-					},
-					features: {
-					  json: {
-						mimeType: "application/json",
-						tokens: [{ value: stringifiedData }]
-					  }
-					}
-				  }
-				}
-			  }
-			]
-		  }
+	}
+
+	// Prepare data if both the condition for HUTTERANCE and WHISPER are met 
+	let whisToken;  // Declare whisToken at a higher scope
+	if (hasWhisperEventType && hasUtteranceEventType) {
+		console.log("passato da qui:");
+		whisToken = data.ovon.events.find(event => event.eventType === "whisper").parameters.dialogEvent.features.text.tokens[0];
+		console.log("Whisper Token", whisToken);
+	}
+	  // Fetch data if the condition for UTTERANCE is met
+	let stringifiedDataUT = "";
+	
+	if (hasUtteranceEventType) {
+		const questionToken = data.ovon.events.find(event => event.eventType === "utterance").parameters.dialogEvent.features.text.tokens[0];
+		let question = questionToken && questionToken.value;
+	
+		if (hasWhisperEventType) {
+			question += " " + whisToken.value; // Concatenate stringifiedDataWhisper to question
+			// console.log("question concat:", question);
 		}
-		: {
-		  ovon: {
-			conversation: {
-			  id: ovonConversationId
-			},
-			sender: {
-			  from: "browser"
-			},
-			responseCode: 200,
-			events: [
-			  {
-				eventType: "utterance",
-				parameters: {
-				  dialogEvent: {
-					speakerId: "assistant",
-					span: {
-					  startTime: new Date().toISOString()
-					},
-					features: {
-					  text: {
-						mimeType: "text/plain",
-						tokens: [
-						  {
-							value: "Welcome to the OVON Smart Library service! I can look up information about books if you provide a valid ISBN number."
-						  }
-						]
-					  }
-					}
-				  }
-				}
-			  }
-			]
-		  }
-		};
   
+		if (question) {
+			try {
+				const { assistantResponse } = await askModel(question);
+				LLM_response = assistantResponse;
+				console.log("LLM Response:", LLM_response);
+		
+				// Use LLM_response in fetchData
+			//	stringifiedDataUT = await fetchData(LLM_response);
+			//	console.log("Stringified Data:", stringifiedDataUT);
+			} catch (error) {
+				console.error(error);
+			}
+		} else {
+			console.log("UTTERANCE_value not found in the JSON.");
+		}
+		
+	}
+
+	  // Preparing JSON RESPONSES
+
+		let myJson;
+		if (hasWhisperEventType && !hasUtteranceEventType) {
+			myJson = {
+				ovon: {
+					conversation: {
+						id: ovonConversationId
+					},
+					sender: {
+						from: "Smart Library APIs"
+					},
+					responseCode: 200,
+					events: [
+						{
+							eventType: "utterance",
+							parameters: {
+								dialogEvent: {
+									speakerId: "assistant",
+									span: {
+										startTime: new Date().toISOString()
+									},
+									features: {
+										json: {
+											mimeType: "application/json",
+											tokens: [{ value: stringifiedDataWhisper }]
+										}
+									}
+								}
+							}
+						}
+					]
+				}
+			};
+		} else if (hasUtteranceEventType) {
+			myJson = {
+				ovon: {
+					conversation: {
+						id: ovonConversationId
+					},
+					sender: {
+						from: "Smart Library APIs"
+					},
+					responseCode: 200,
+					events: [
+						{
+							eventType: "utterance",
+							parameters: {
+								dialogEvent: {
+									speakerId: "assistant",
+									span: {
+										startTime: new Date().toISOString()
+									},
+									features: {
+										json: {
+											mimeType: "application/json",
+											tokens: [{ value: JSON.stringify(LLM_response) }]
+										}
+									}
+								}
+							}
+						}
+					]
+				}
+			};
+		} else {
+			// Default logic or response for scenarios other than whisper or utterance
+			myJson = {
+				// Default JSON structure
+				ovon: {
+					conversation: {
+					  id: ovonConversationId
+					},
+					sender: {
+					  from: "browser"
+					},
+					responseCode: 200,
+					events: [
+					  {
+						eventType: "utterance",
+						parameters: {
+						  dialogEvent: {
+							speakerId: "assistant",
+							span: {
+							  startTime: new Date().toISOString()
+							},
+							features: {
+							  text: {
+								mimeType: "text/plain",
+								tokens: [
+								  {
+									value: "Welcome to the OVON Smart Library service! I can look up information about books if you provide a valid ISBN number."
+								  }
+								]
+							  }
+							}
+						  }
+						}
+					  }
+					]
+				  }
+			};
+		};
+		
+
 	  // Convert the JSON object to a string for display or transmission
 	  const jsonString = JSON.stringify(myJson);
   
 	  // Log the result to the console
 	  //console.log(jsonString);
-  
+
 	  // Send the jsonString as POST RESPONSE
 	  res.status(201).send(jsonString);
 	} catch (error) {
 	  //console.error('Error:', error);
 	  res.status(500).send('Internal Server Error');
 	}
+
+	
   });
 // POST Management END
 
