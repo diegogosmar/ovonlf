@@ -80,14 +80,15 @@ function fetchData(isbnValue) {
   
 	  const ovonConversationId = data.ovon.conversation.id;
 	  const ovonevent = data.ovon.events;
+	  console.log('ConversationId:', ovonConversationId);
 
 	// Check if data.ovon.events contains the eventType named "whisper"
 	const hasWhisperEventType = data.ovon.events.some(event => event.eventType === "whisper");
-	console.log('Has Whisper:', hasWhisperEventType);
+	//console.log('Has Whisper:', hasWhisperEventType);
 
     // Check if data.ovon.events contains the eventType named "utterance"
     const hasUtteranceEventType = data.ovon.events.some(event => event.eventType === "utterance");
-	console.log('Has Utterance:', hasUtteranceEventType);
+	//console.log('Has Utterance:', hasUtteranceEventType);
 
 	  // Fetch data if ONLY the condition for WHISPER is met (intended for pure ISBN queries) 
 	  let stringifiedDataWhisper = "";
