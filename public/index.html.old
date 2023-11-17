@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OVON Smart Library</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="container">
+        <form id="inviteForm">
+            <textarea id="userText" maxlength="300"></textarea>
+            <button type="submit" name="action" value="invite">INVITE</button>
+            <button type="submit" name="action" value="utterance">UTTERANCE</button>
+        </form>
+        <div id="waitingMessage" style="display: none;">Please wait...</div>
+        <div id="response"></div>
+    </div>
+
+    <script>
+     document.getElementById('inviteForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const userText = document.getElementById('userText').value;
+    const action = e.submitter.value;
+    const responseDiv = document.getElementById('response');
+    const waitingMessageDiv = document.getElementById('waitingMessage');
+
+    waitingMessageDiv.style.display = 'block'; // Show the waiting message
+
+    try {
+        const response = await fetch('/sendAction', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=${encodeURIComponent(action)}&userText=${encodeURIComponent(userText)}`
+        });
+        const jsonResponse = await response.json();
+        responseDiv.textContent = JSON.stringify(jsonResponse, null, 2);
+    } catch (error) {
+        console.error('Error:', error);
+        responseDiv.textContent = 'Error in sending request';
+    }
+
+    waitingMessageDiv.style.display = 'none'; // Hide the waiting message
+});
+    </script>
+</body>
+</html>

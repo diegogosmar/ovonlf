@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OVON Smart Library</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="container">
+        <form id="inviteForm">
+            <textarea id="userText" maxlength="300"></textarea>
+            <button type="submit" name="action" value="invite">INVITE</button>
+            <button type="submit" name="action" value="utterance">UTTERANCE</button>
+        </form>
+        <div id="waitingMessage" style="display: none;">Please wait...</div>
+        <div id="jsonRequest" style="margin-top: 20px;"></div>
+        <div id="jsonResponse" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+    document.getElementById('inviteForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const userText = document.getElementById('userText').value;
+    const action = e.submitter.value; // Determines whether it's 'invite' or 'utterance'
+    const waitingMessageDiv = document.getElementById('waitingMessage');
+    const requestDiv = document.getElementById('jsonRequest');
+    const responseDiv = document.getElementById('jsonResponse');
+
+    let postData = {};
+    let timest = Date.now()
+
+    if (action === 'invite') {
+        postData = {
+            "ovon": {
+                "schema": {
+                  "version": "1.0.1",
+                  "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
+                },
+                "conversation": {
+                  "id": "conv_" + timest
+                },
+                "sender": {
+                  "from": "https://organization_url_from",
+                  "reply-to": "https://organization_url_to"
+                },
+                "responseCode": 200,
+                "events": [
+                    {
+                        "eventType": "invite",
+                        "parameters": {
+                            "to": {
+                                "url": "https://ovon.xcally.com"
+                            }
+                        }
+                    }
+                ]
+            }
+        };
+    } else if (action === 'utterance') {
+        postData = {
+            "ovon": {
+                "schema": {
+                  "version": "1.0.1",
+                  "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
+                },
+                "conversation": {
+                  "id": "conv_" + timest
+                },
+                "sender": {
+                  "from": "https://organization_url_from",
+                  "reply-to": "https://organization_url_to"
+                },
+                "responseCode": 200,
+                "events": [
+                    {
+                        "eventType": "utterance",
+                        "parameters": {
+                            "dialogEvent": {
+                                "speakerId": "humanOrAssistantID",
+                                "span": { "startTime": new Date().toISOString() },
+                                "features": {
+                                    "text": {
+                                        "mimeType": "text/plain",
+                                        "tokens": [{ "value": userText }]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        };
+    }
+
+    requestDiv.innerHTML = '<span style="font-weight: bold; color: blue;">JSON Request:</span> ' + JSON.stringify(postData, null, 2);
+    waitingMessageDiv.style.display = 'block'; // Show the waiting message
+
+    try {
+        const response = await fetch('/sendAction', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=${encodeURIComponent(action)}&userText=${encodeURIComponent(userText)}&timest=${encodeURIComponent(timest)}`
+        });
+        const jsonResponse = await response.json();
+        responseDiv.innerHTML = '<span style="font-weight: bold; color: green;">JSON Response:</span> ' + JSON.stringify(jsonResponse, null, 2);
+    } catch (error) {
+        console.error('Error:', error);
+        responseDiv.textContent = 'Error in sending request';
+    }
+
+    waitingMessageDiv.style.display = 'none'; // Hide the waiting message
+});
+    </script>
+</body>
+</html>
