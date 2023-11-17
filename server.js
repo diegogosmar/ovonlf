@@ -2,7 +2,7 @@ const express = require('express');
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 const app = express();
-const port = 3000;
+const port = 8080;
 const https = require('https');
 
 // URL as a constant for easy modification
@@ -112,5 +112,5 @@ app.post('/sendAction', async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Server running at PORT: ${port}`);
 });
