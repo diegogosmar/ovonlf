@@ -11,22 +11,36 @@
             <button type="submit" name="action" value="invite">INVITE</button>
             <button type="submit" name="action" value="utterance">UTTERANCE</button>
         </form>
-        <div id="waitingMessage" style="display: none;">Please wait...</div>
-        <div id="jsonRequest" style="margin-top: 20px;"></div>
-        <div id="jsonResponse" style="margin-top: 20px;"></div>
-    </div>
+        <div id="inviteWaitingMessage" style="display: none;">Please wait...</div>
+        <div id="inviteJsonRequest" style="margin-top: 20px;"></div>
+        <div id="inviteJsonResponse" style="margin-top: 20px;"></div>
+    
+        <!-- Spacing between the two forms -->
+        <br><br>
+    
+        <!-- New Form for WHISPER-ONLY and WHISP-UTTER -->
+        <form id="whisperForm">
+            <textarea id="userText2" maxlength="300"></textarea>
+            <button type="submit" name="action" value="whisperOnly">WHISPER-ONLY</button>
+            <button type="submit" name="action" value="whispUtter">WHISP-UTTER</button>            
+        </form>
+        <div id="whisperWaitingMessage" style="display: none;">Please wait...</div>
+        <div id="whisperJsonRequest" style="margin-top: 20px;"></div>
+        <div id="whisperJsonResponse" style="margin-top: 20px;"></div>
+    </div>    
 
     <script>
     document.getElementById('inviteForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const userText = document.getElementById('userText').value;
     const action = e.submitter.value; // Determines whether it's 'invite' or 'utterance'
-    const waitingMessageDiv = document.getElementById('waitingMessage');
-    const requestDiv = document.getElementById('jsonRequest');
-    const responseDiv = document.getElementById('jsonResponse');
+    console.log('Action:', action, 'User Text:', userText); // Log the action and user text
 
+    const inviteWaitingMessageDiv = document.getElementById('inviteWaitingMessage');
+    const inviteRequestDiv = document.getElementById('inviteJsonRequest');
+    const inviteResponseDiv = document.getElementById('inviteJsonResponse');
     let postData = {};
-    let timest = Date.now()
+    let timest = Date.now();
 
     if (action === 'invite') {
         postData = {
@@ -91,8 +105,7 @@
         };
     }
 
-    requestDiv.innerHTML = '<span style="font-weight: bold; color: blue;">JSON Request:</span> ' + JSON.stringify(postData, null, 2);
-    waitingMessageDiv.style.display = 'block'; // Show the waiting message
+    inviteWaitingMessageDiv.style.display = 'block'; // Show the waiting message
 
     try {
         const response = await fetch('/sendAction', {
@@ -101,14 +114,146 @@
             body: `action=${encodeURIComponent(action)}&userText=${encodeURIComponent(userText)}&timest=${encodeURIComponent(timest)}`
         });
         const jsonResponse = await response.json();
-        responseDiv.innerHTML = '<span style="font-weight: bold; color: green;">JSON Response:</span> ' + JSON.stringify(jsonResponse, null, 2);
+        inviteRequestDiv.innerHTML = '<span style="font-weight: bold; color: blue;">JSON Request:</span> ' + JSON.stringify(postData, null, 2);
+        inviteResponseDiv.innerHTML = '<span style="font-weight: bold; color: green;">JSON Response:</span> ' + JSON.stringify(jsonResponse, null, 2);
     } catch (error) {
         console.error('Error:', error);
-        responseDiv.textContent = 'Error in sending request';
+        inviteResponseDiv.textContent = 'Error in sending request';
     }
 
-    waitingMessageDiv.style.display = 'none'; // Hide the waiting message
+    inviteWaitingMessageDiv.style.display = 'none'; // Hide the waiting message
+    console.log('Fetch request sent to /sendAction');
 });
+
+// Handling for WHISPER-ONLY and WHISP-UTTER
+    document.getElementById('whisperForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const userText = document.getElementById('userText').value;
+    const userText2 = document.getElementById('userText2').value;
+    const action = e.submitter.value;
+    const whisperWaitingMessageDiv = document.getElementById('whisperWaitingMessage');
+    const whisperRequestDiv = document.getElementById('whisperJsonRequest');
+    const whisperResponseDiv = document.getElementById('whisperJsonResponse');
+    let postData = {};
+    let timest = Date.now();
+
+    let requestBody = ""; // Initialize requestBody variable
+
+    if (action === 'whispUtter') {
+        const userText3 = userText + " " + userText2; // Concatenate userText and userText2 for WHISP-UTTER
+        requestBody = `action=${encodeURIComponent(action)}&userText=${encodeURIComponent(userText3)}&timest=${encodeURIComponent(timest)}`;
+    } else {
+        // For WHISPER-ONLY, use only userText2
+        requestBody = `action=${encodeURIComponent(action)}&userText=${encodeURIComponent(userText2)}&timest=${encodeURIComponent(timest)}`;
+    }
+
+        if (action === 'whisperOnly') {
+            postData = {
+                "ovon": {
+                    "schema": {
+                        "version": "1.0.1",
+                        "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
+                    },
+                    "conversation": {
+                        "id": "conv_" + timest
+                    },
+                    "sender": {
+                        "from": "https://organization_url_from",
+                        "reply-to": "https://organization_url_to"
+                    },
+                    "responseCode": 200,
+                    "events": [
+                        {
+                            "eventType": "whisper",
+                            "parameters": {
+                                "dialogEvent": {
+                                    "speakerId": "humanOrAssistantID",
+                                    "span": { "startTime": new Date().toISOString() },
+                                    "features": {
+                                        "text": {
+                                            "mimeType": "text/plain",
+                                            "tokens": [{ "value": userText2 }]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            };
+        } else if (action === 'whispUtter') {
+            postData = {
+                "ovon": {
+                    "schema": {
+                        "version": "1.0.1",
+                        "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
+                    },
+                    "conversation": {
+                        "id": "conv_" + timest
+                    },
+                    "sender": {
+                        "from": "https://organization_url_from",
+                        "reply-to": "https://organization_url_to"
+                    },
+                    "responseCode": 200,
+                    "events": [
+                        {
+                            "eventType": "utterance",
+                            "parameters": {
+                                "dialogEvent": {
+                                    "speakerId": "humanOrAssistantID",
+                                    "span": { "startTime": new Date().toISOString() },
+                                    "features": {
+                                        "text": {
+                                            "mimeType": "text/plain",
+                                            "tokens": [{ "value": userText }]
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "eventType": "whisper",
+                            "parameters": {
+                                "dialogEvent": {
+                                    "speakerId": "humanOrAssistantID",
+                                    "span": { "startTime": new Date().toISOString() },
+                                    "features": {
+                                        "text": {
+                                            "mimeType": "text/plain",
+                                            "tokens": [{ "value": userText2 }]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            };
+        }
+
+        whisperWaitingMessageDiv.style.display = 'block'; // Show the waiting message
+
+        try {
+        const response = await fetch('/sendAction', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: requestBody
+        });
+        const jsonResponse = await response.json();
+        whisperRequestDiv.innerHTML = '<span style="font-weight: bold; color: blue;">JSON Request:</span> ' + JSON.stringify(postData, null, 2);
+        whisperResponseDiv.innerHTML = '<span style="font-weight: bold; color: green;">JSON Response:</span> ' + JSON.stringify(jsonResponse, null, 2);
+    } catch (error) {
+        console.error('Error:', error);
+        whisperResponseDiv.textContent = 'Error in sending request';
+    }
+
+    whisperWaitingMessageDiv.style.display = 'none'; // Hide the waiting message
+});
+
     </script>
+<footer>
+    <p>OVON Smart Library 3rd party Conversational AI Universal API testing, Diego Gosmar</p>
+</footer>
 </body>
 </html>

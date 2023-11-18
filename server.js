@@ -15,12 +15,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Serve static files from 'public' folder
 app.use(express.static('public'));
 
+app.use(express.json());
+
 app.post('/sendAction', async (req, res) => {
-    console.log('Received Request:', req.body); // Log the entire request body
-    const { userText, action, timest } = req.body;
-    //const ovonConversationId = data.ovon.conversation.id;
-    //console.log('ConversationId:', ovonConversationId);
-    //const timestamp = Date.now();
+    console.log('Request received on /sendAction');
+    console.log('Received Request:', req.body);
+    const { userText, action, timest } = req.body; // Extract userText2 as well
+
     let postData;
 
     if (action === 'invite') {
@@ -86,9 +87,108 @@ app.post('/sendAction', async (req, res) => {
                 ]
             }
         };
+    } else if (action === 'whisperOnly') {
+        postData = {
+            "ovon": {
+                "schema": {
+                  "version": "1.0.1",
+                  "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
+                },
+                "conversation": {
+                  "id": timest
+                },
+                "sender": {
+                  "from": "https://organization_url_from",
+                  "reply-to": "https://organization_url_to"
+                },
+                "responseCode": 200,
+                "events": [
+                  {
+                    "eventType": "invite",
+                    "parameters": {
+                      "to": {
+                        "url": "https://ovon.xcally.com"
+                      }
+                     }
+                   },
+                    {
+                    "eventType": "whisper",
+                      "parameters": {
+                        "dialogEvent": {
+                          "speakerId": "humanOrAssistantID",
+                          "span": { "startTime": new Date().toISOString()  },
+                          "features": {
+                            "text": {
+                              "mimeType": "text/plain",
+                              "tokens": [ { "value": userText } ] 
+                            }
+                          }
+                        }
+                      }
+                    }
+                ]
+              }
+            };
+    } else if (action === 'whispUtter') {
+        postData = {
+            "ovon": {
+                "schema": {
+                  "version": "1.0.1",
+                  "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
+                },
+                "conversation": {
+                  "id": timest
+                },
+                "sender": {
+                  "from": "https://organization_url_from",
+                  "reply-to": "https://organization_url_to"
+                },
+                "responseCode": 200,
+                "events": [
+                  {
+                    "eventType": "invite",
+                    "parameters": {
+                      "to": {
+                        "url": "https://ovon.xcally.com"
+                      }
+                     }
+                   },
+                    {
+                    "eventType": "utterance",
+                      "parameters": {
+                        "dialogEvent": {
+                          "speakerId": "humanOrAssistantID",
+                          "span": { "startTime": new Date().toISOString() },
+                          "features": {
+                            "text": {
+                              "mimeType": "text/plain",
+                              "tokens": [ { "value": userText } ] 
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                    "eventType": "whisper",
+                      "parameters": {
+                        "dialogEvent": {
+                          "speakerId": "humanOrAssistantID",
+                          "span": { "startTime": new Date().toISOString() },
+                          "features": {
+                            "text": {
+                              "mimeType": "text/plain",
+                              "tokens": [ { userText } ] 
+                            }
+                          }
+                        }
+                      }
+                    }
+                ]
+              }
+            };
     }
 
-    // Set to falso to create an agent that ignores SSL certificate errors
+    // Set to false to create an agent that ignores SSL certificate errors
     const httpsAgent = new https.Agent({
     rejectUnauthorized: true 
 });
