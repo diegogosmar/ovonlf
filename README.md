@@ -7,7 +7,7 @@ The purpose of this APIs is to supports some interaction responses via standard 
 
 The code is based on node.js and express.
 
-Minimal POST REQUEST example:
+## Minimal POST REQUEST example:
 
 To be sent to an endpoint like https://yourcodehostingdomain/smartlibrary
 
@@ -45,7 +45,7 @@ to the OVON Smart Library service! WHISPER me any valid Book ISBN code please, a
 you!"}]}}}}}]}}
 
 
-WHISPER POST REQUEST example to send the ISDN code:<br>
+## WHISPER POST REQUEST example to send the ISDN code:<br>
 <br>
 To be sent to an endpoint like https://yourcodehostingdomain/smartlibrary
 <br>
@@ -104,7 +104,9 @@ Potter
 <br><br>
 The following two options require proper Hugging Face API Key:
 <br><br>
-UTTERANCE POST REQUEST example to send the ISDN code:<br>
+
+## UTTERANCE POST REQUEST example to send the ISDN code:<br>
+
 <br>
 To be sent to an endpoint like https://yourcodehostingdomain/smartlibrary<br>
 <br>
@@ -157,7 +159,9 @@ APIs"},"responseCode":200,"events":[{"eventType":"utterance","parameters":{"dial
 Hemingway wrote the novel \\\"The Old Man and the Sea.\\\" It was published in 1952.\""}]}}}}}]}}
 <br>
 <br>
-UTTERANCE + WHISPER POST REQUEST example to send the ISDN code:<br>
+
+## UTTERANCE + WHISPER POST REQUEST example to send the ISDN code:<br>
+
 <br>
 To be sent to an endpoint like https://yourcodehostingdomain/smartlibrary<br>
 <br>
@@ -232,7 +236,7 @@ misspelled as \\\"Harry Potter\\\" on the cover and in some internal pages. This
 edition.\\n\\nOverall, the second edition of \\\"Harry Potter and the Philosopher's Stone\\\" is a revised and updated
 version of the first edition, with a new cover design and some minor corrections.\""}]}}}}}]}}
 
-##Further improvements
+## WEB APP
 A full web page is available to try the API.<br>
 It requires some kind of basic Authentication to access.<br>
 pm2 start server443.js<br>
@@ -241,7 +245,7 @@ Access:<br>
 https://your_domain
 <br>
 
-###Miscellaneus
+### Miscellaneus
 <br>
 
 Setup your self-certificate, to have the node.js code working properly with https:<br>
