@@ -1,3 +1,10 @@
+<!--
+Smart Library OVON universal API examples
+Diego Gosmar - 2023, 2024
+The purpose of this APIs is to supports some interaction responses via standard POST messages compatible with the
+OVON Interoperable Conversation Envelope Specification, in order to provide an example of book information agent.
+-->
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,30 +12,50 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="container">
-        <form id="inviteForm">
-            <textarea id="userText" maxlength="300"></textarea>
-            <button type="submit" name="action" value="invite">INVITE</button>
-            <button type="submit" name="action" value="utterance">UTTERANCE</button>
-        </form>
-        <div id="inviteWaitingMessage" style="display: none;">Please wait...</div>
-        <div id="inviteJsonRequest" style="margin-top: 20px;"></div>
-        <div id="inviteJsonResponse" style="margin-top: 20px;"></div>
-    
-        <!-- Spacing between the two forms -->
-        <br><br>
-    
-        <!-- New Form for WHISPER-ONLY and WHISP-UTTER -->
-        <form id="whisperForm">
-            <textarea id="userText2" maxlength="300"></textarea>
-            <button type="submit" name="action" value="whisperOnly">WHISPER-ONLY</button>
-            <button type="submit" name="action" value="whispUtter">WHISP-UTTER</button>            
-        </form>
-        <div id="whisperWaitingMessage" style="display: none;">Please wait...</div>
-        <div id="whisperJsonRequest" style="margin-top: 20px;"></div>
-        <div id="whisperJsonResponse" style="margin-top: 20px;"></div>
-    </div>    
 
+    <div id="loginForm">
+        <form id="authForm">
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <!-- Main App Content (Hidden Initially) -->
+    <div id="mainContent" style="display: none;">
+
+        <!-- Logout Button (Hidden Initially) -->
+        <button id="logoutButton" style="display: none; position: absolute; top: 10px; right: 10px;">Logout</button>
+
+        <div id="container">
+            <form id="inviteForm">
+                <textarea id="userText" maxlength="300"></textarea>
+                <button type="submit" name="action" value="invite">INVITE</button>
+                <button type="submit" name="action" value="utterance">UTTERANCE</button>
+            </form>
+            <div id="inviteWaitingMessage" style="display: none;">Please wait...</div>
+            <div id="inviteJsonRequest" style="margin-top: 20px;"></div>
+            <div id="inviteJsonResponse" style="margin-top: 20px;"></div>
+        
+            <br><br> <!-- Spacing between the two forms -->
+        
+            <form id="whisperForm">
+                <textarea id="userText2" maxlength="300"></textarea>
+                <button type="submit" name="action" value="whisperOnly">WHISPER-ONLY</button>
+                <button type="submit" name="action" value="whispUtter">WHISP-UTTER</button>            
+            </form>
+            <div id="whisperWaitingMessage" style="display: none;">Please wait...</div>
+            <div id="whisperJsonRequest" style="margin-top: 20px;"></div>
+            <div id="whisperJsonResponse" style="margin-top: 20px;"></div>
+        </div>    
+
+        <footer>
+            <p>OVON Smart Library 3rd party Conversational AI Universal API testing, Diego Gosmar</p>
+        </footer>
+
+    </div>  
+    
+     <!-- JavaScript for Form Request and Response Submission Handling -->
     <script>
     document.getElementById('inviteForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -252,8 +279,39 @@
 });
 
     </script>
-<footer>
-    <p>OVON Smart Library 3rd party Conversational AI Universal API testing, Diego Gosmar</p>
-</footer>
+
+<!-- JavaScript for Login Form Handling -->
+<script>
+    document.getElementById('authForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+        });
+        const result = await response.json();
+        if (result.authenticated) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('logoutButton').style.display = 'block';
+        } else {
+            alert('Invalid credentials');
+        }
+    });
+
+    // Logout button handler
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        document.getElementById('loginForm').style.display = 'block'; // Show login form
+        document.getElementById('mainContent').style.display = 'none'; // Hide main content
+        document.getElementById('logoutButton').style.display = 'none'; // Hide logout button
+
+        // Clear the username and password fields
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+    });
+</script>
+
 </body>
 </html>

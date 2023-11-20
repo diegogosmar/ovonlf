@@ -1,4 +1,10 @@
+// Smart Library OVON universal API examples //
+// Diego Gosmar - 2023, 2024 //
+// The purpose of this APIs is to supports some interaction responses via standard POST messages compatible with the //
+// OVON Interoperable Conversation Envelope Specification, in order to provide an example of book information agent. //
+
 const express = require('express');
+const fs = require('fs').promises;
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 const app = express();
@@ -16,6 +22,54 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 app.use(express.json());
+
+// AAA START
+
+// Function to read credentials
+async function readCredentials() {
+    const username = await fs.readFile('../usr_smart', 'utf8');
+    const password = await fs.readFile('../pwd_smart', 'utf8');
+    return { username, password };
+}
+
+// Authentication middleware
+async function authenticate(req, res, next) {
+    const { username, password } = await readCredentials();
+    if (req.body.username === username && req.body.password === password) {
+        next();
+    } else {
+        res.status(401).send('Unauthorized');
+    }
+}
+
+// Authentication route
+app.post('/login', async (req, res) => {
+    try {
+        const { username, password } = await readCredentials();
+        console.log(`Expected Username: ${username}, Expected Password: ${password}`); // Log credentials from files
+        console.log(`Received Username: ${req.body.username}, Received Password: ${req.body.password}`); // Log received credentials
+
+        if (req.body.username === username.trim() && req.body.password === password.trim()) {
+            res.send({ authenticated: true });
+        } else {
+            res.send({ authenticated: false });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
+
+// Serve static files
+app.use(express.static('.'));
+
+// Protect your main route
+app.get('/', authenticate, (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+
+// AAA END
 
 app.post('/sendAction', async (req, res) => {
     console.log('Request received on /sendAction');
