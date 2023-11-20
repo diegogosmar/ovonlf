@@ -51,8 +51,8 @@ async function authenticate(req, res, next) {
 app.post('/login', async (req, res) => {
     try {
         const { username, password } = await readCredentials();
-        console.log(`Expected Username: ${username}, Expected Password: ${password}`); // Log credentials from files
-        console.log(`Received Username: ${req.body.username}, Received Password: ${req.body.password}`); // Log received credentials
+       // console.log(`Expected Username: ${username}, Expected Password: ${password}`); // Log credentials from files
+       // console.log(`Received Username: ${req.body.username}, Received Password: ${req.body.password}`); // Log received credentials
 
         if (req.body.username === username.trim() && req.body.password === password.trim()) {
             res.send({ authenticated: true });

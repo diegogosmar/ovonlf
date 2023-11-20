@@ -20,6 +20,18 @@ OVON Interoperable Conversation Envelope Specification, in order to provide an e
             <button type="submit">Login</button>
         </form>
     </div>
+    
+    <!-- New Instructions Div -->
+  <div id="instructions" style="display: none;">
+    <h2>INSTRUCTIONS:</h2>
+    <ul>
+        <li><b>INVITE</b>: type anything in the upper form (i.e., "Hello"), click on the INVITE Button and you'll see the JSON Request and Response OVON Envelope Specs compliant.</li>
+        <li><b>UTTERANCE</b>: ask a question in the upper form (i.e., "What's the last book of Dan Brown?"), click on the UTTERANCE Button and see the JSON Req/Res.</li>
+        <li><b>WHISPER-ONLY</b>: insert a valid ISBN code in the lower form (i.e., "9780099908401"), click on the WHISPER-ONLY Button and see the JSON Req/Res.</li>
+        <li><b>WHISP-UTTER</b>: combine a main question in the upper form and more details in the lower form and click on the WHISP-UTTER button to see the result (i.e. upper-text: "Can I have any info about Harry Potter?" and lower-text: "describe me the second book please.").</li>
+        <li><b>CLEAR</b>: use the CLEAR button to reset the JSON logs.</li>
+    </ul>
+  </div>
 
     <!-- Main App Content (Hidden Initially) -->
     <div id="mainContent" style="display: none;">
@@ -48,10 +60,10 @@ OVON Interoperable Conversation Envelope Specification, in order to provide an e
             <div id="whisperWaitingMessage" style="display: none;">Please wait...</div>
             <div id="whisperJsonRequest" style="margin-top: 20px;"></div>
             <div id="whisperJsonResponse" style="margin-top: 20px;"></div>
-        </div>    
+        </div>          
 
         <footer>
-            <p>OVON Smart Library 3rd party Conversational AI Universal API testing, Diego Gosmar</p>
+            <p><b>OVON Smart Library 3rd party Conversational AI Universal API testing, Diego Gosmar</b></p>
         </footer>
 
     </div>  
@@ -294,10 +306,12 @@ OVON Interoperable Conversation Envelope Specification, in order to provide an e
         });
         const result = await response.json();
         if (result.authenticated) {
+            //Show these elements after login
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('logoutButton').style.display = 'block';
             document.getElementById('clearButton').style.display = 'block';
+            document.getElementById('instructions').style.display = 'block';
         } else {
             alert('Invalid credentials');
         }
