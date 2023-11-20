@@ -5,6 +5,7 @@ body {
     padding: 20px 0; /* Adds padding to the top and bottom */
     display: flex;
     justify-content: center;
+    margin-bottom: 60px; /* Adjust the value to the height of your footer */
 }
 
 #inviteForm {
@@ -68,6 +69,7 @@ button:hover {
 #container {
     width: 100%;
     max-width: 600px; /* Adjusts the maximum width of the container */
+    max-height: 2000px; /* Adjust as needed */
     margin: auto;
 }
 
@@ -109,6 +111,9 @@ footer p {
     margin: 0;
     color: #333; /* Adjust the color as needed */
     font-size: 16px; /* Adjust the font size as needed */
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }
 font-size: 16px; /* Adjust the font size as needed */
 

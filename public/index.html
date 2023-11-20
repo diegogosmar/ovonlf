@@ -24,8 +24,9 @@ OVON Interoperable Conversation Envelope Specification, in order to provide an e
     <!-- Main App Content (Hidden Initially) -->
     <div id="mainContent" style="display: none;">
 
-        <!-- Logout Button (Hidden Initially) -->
+        <!-- Logout and Clear Buttons (Hidden Initially) -->
         <button id="logoutButton" style="display: none; position: absolute; top: 10px; right: 10px;">Logout</button>
+        <button id="clearButton" style="display: none; position: absolute; top: 50px; right: 10px;">Clear</button>
 
         <div id="container">
             <form id="inviteForm">
@@ -296,6 +297,7 @@ OVON Interoperable Conversation Envelope Specification, in order to provide an e
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('logoutButton').style.display = 'block';
+            document.getElementById('clearButton').style.display = 'block';
         } else {
             alert('Invalid credentials');
         }
@@ -303,14 +305,26 @@ OVON Interoperable Conversation Envelope Specification, in order to provide an e
 
     // Logout button handler
     document.getElementById('logoutButton').addEventListener('click', function() {
-        document.getElementById('loginForm').style.display = 'block'; // Show login form
-        document.getElementById('mainContent').style.display = 'none'; // Hide main content
-        document.getElementById('logoutButton').style.display = 'none'; // Hide logout button
+    document.getElementById('loginForm').style.display = 'block'; // Show login form
+    document.getElementById('mainContent').style.display = 'none'; // Hide main content
+    document.getElementById('logoutButton').style.display = 'none'; // Hide logout button
 
-        // Clear the username and password fields
-        document.getElementById('username').value = '';
-        document.getElementById('password').value = '';
+    // Clear the username and password fields
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
     });
+     
+    // Clear button handler
+    document.getElementById('clearButton').addEventListener('click', function() {
+    // Clear JSON Request and Response for Invite
+    document.getElementById('inviteJsonRequest').innerHTML = '';
+    document.getElementById('inviteJsonResponse').innerHTML = '';
+
+    // Clear JSON Request and Response for Whisper
+    document.getElementById('whisperJsonRequest').innerHTML = '';
+    document.getElementById('whisperJsonResponse').innerHTML = '';
+    });
+
 </script>
 
 </body>
