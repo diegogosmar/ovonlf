@@ -245,7 +245,7 @@ Access:<br>
 https://your_domain
 <br>
 
-### Miscellaneus
+## Miscellaneus
 <br>
 
 Setup your self-certificate, to have the node.js code working properly with https:<br>
