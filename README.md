@@ -232,6 +232,15 @@ misspelled as \\\"Harry Potter\\\" on the cover and in some internal pages. This
 edition.\\n\\nOverall, the second edition of \\\"Harry Potter and the Philosopher's Stone\\\" is a revised and updated
 version of the first edition, with a new cover design and some minor corrections.\""}]}}}}}]}}
 
+##Further improvements
+A full web page is available to try the API.<br>
+It requires some kind of basic Authentication to access.<br>
+pm2 start server443.js<br>
+
+Access:<br>
+https://your_domain
+<br>
+
 ###Miscellaneus
 <br>
 
