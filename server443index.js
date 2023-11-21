@@ -474,7 +474,7 @@ function fetchData(isbnValue) {
 					  id: ovonConversationId
 					},
 					sender: {
-					  from: "browser"
+					  from: "https://ovon.xcally.com"
 					},
 					responseCode: 200,
 					events: [
