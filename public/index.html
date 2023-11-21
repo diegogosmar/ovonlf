@@ -39,6 +39,7 @@ OVON Interoperable Conversation Envelope Specification, in order to provide an e
         <!-- Logout and Clear Buttons (Hidden Initially) -->
         <button id="logoutButton" style="display: none; position: absolute; top: 10px; right: 10px;">Logout</button>
         <button id="clearButton" style="display: none; position: absolute; top: 50px; right: 10px;">Clear JSON</button>
+        <button id="hideHelpButton" style="display: none; position: absolute; top: 90px; right: 10px;">Hide Help</button>
 
         <div id="container">
             <form id="inviteForm">
@@ -312,6 +313,7 @@ OVON Interoperable Conversation Envelope Specification, in order to provide an e
             document.getElementById('logoutButton').style.display = 'block';
             document.getElementById('clearButton').style.display = 'block';
             document.getElementById('instructions').style.display = 'block';
+            document.getElementById('hideHelpButton').style.display = 'block';
         } else {
             alert('Invalid credentials');
         }
@@ -322,6 +324,7 @@ OVON Interoperable Conversation Envelope Specification, in order to provide an e
     document.getElementById('loginForm').style.display = 'block'; // Show login form
     document.getElementById('mainContent').style.display = 'none'; // Hide main content
     document.getElementById('logoutButton').style.display = 'none'; // Hide logout button
+    document.getElementById('instructions').style.display = 'block'; // Hide the Hidfe Help button
 
     // Clear the username and password fields
     document.getElementById('username').value = '';
@@ -337,6 +340,11 @@ OVON Interoperable Conversation Envelope Specification, in order to provide an e
     // Clear JSON Request and Response for Whisper
     document.getElementById('whisperJsonRequest').innerHTML = '';
     document.getElementById('whisperJsonResponse').innerHTML = '';
+    });
+
+    // "Hide Help" button event handler
+    document.getElementById('hideHelpButton').addEventListener('click', function() {
+    document.getElementById('instructions').style.display = 'none';
     });
 
 </script>
