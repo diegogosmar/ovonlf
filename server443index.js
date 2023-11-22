@@ -97,7 +97,10 @@ app.post('/sendAction', async (req, res) => {
                   "from": "https://organization_url_from",
                   "reply-to": "https://organization_url_to"
                 },
-                "responseCode": 200,
+                "responseCode": {
+                  "code": 200,
+                  "description": "OK"
+                },
                 "events": [
                     {
                         "eventType": "invite",
@@ -124,7 +127,10 @@ app.post('/sendAction', async (req, res) => {
                   "from": "https://organization_url_from",
                   "reply-to": "https://organization_url_to"
                 },
-                "responseCode": 200,
+                "responseCode": {
+                  "code": 200,
+                  "description": "OK"
+                },
                 "events": [
                     {
                         "eventType": "utterance",
@@ -160,7 +166,10 @@ app.post('/sendAction', async (req, res) => {
                   "from": "https://organization_url_from",
                   "reply-to": "https://organization_url_to"
                 },
-                "responseCode": 200,
+                "responseCode": {
+                  "code": 200,
+                  "description": "OK"
+                },
                 "events": [
                   {
                     "eventType": "invite",
@@ -202,7 +211,10 @@ app.post('/sendAction', async (req, res) => {
                   "from": "https://organization_url_from",
                   "reply-to": "https://organization_url_to"
                 },
-                "responseCode": 200,
+                "responseCode": {
+                  "code": 200,
+                  "description": "OK"
+                },
                 "events": [
                   {
                     "eventType": "invite",
@@ -412,7 +424,10 @@ function fetchData(isbnValue) {
 					sender: {
 						from: "Smart Library APIs"
 					},
-					responseCode: 200,
+					responseCode: {
+            "code": 200,
+            "description": "OK"
+          },
 					events: [
 						{
 							eventType: "utterance",
@@ -443,7 +458,10 @@ function fetchData(isbnValue) {
 					sender: {
 						from: "Smart Library APIs"
 					},
-					responseCode: 200,
+					responseCode: {
+            "code": 200,
+            "description": "OK"
+          },
 					events: [
 						{
 							eventType: "utterance",
@@ -476,7 +494,10 @@ function fetchData(isbnValue) {
 					sender: {
 					  from: "https://ovon.xcally.com"
 					},
-					responseCode: 200,
+					responseCode: {
+            "code": 200,
+            "description": "OK"
+          },
 					events: [
 					  {
 						eventType: "utterance",
