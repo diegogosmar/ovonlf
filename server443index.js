@@ -272,7 +272,7 @@ app.post('/sendAction', async (req, res) => {
             agent: httpsAgent  // Use the custom agent
         });
         const responseBody = await response.text();
-        console.log("Response Body",responseBody);
+        //console.log("Response Body",responseBody);
 
         const jsonResponse = JSON.parse(responseBody);
         res.json(jsonResponse);
@@ -347,11 +347,9 @@ function fetchData(isbnValue) {
 	  storedJsonData = data;
 	  jsonArray.push(data);
   
-	  //console.log('Array set to:', jsonArray);
-  
 	  const ovonConversationId = data.ovon.conversation.id;
 	  const ovonevent = data.ovon.events;
-	  console.log('ConversationId:', ovonConversationId);
+	// console.log('ConversationId:', ovonConversationId);
 
 	// Check if data.ovon.events contains the eventType named "whisper"
 	const hasWhisperEventType = data.ovon.events.some(event => event.eventType === "whisper");
@@ -378,9 +376,8 @@ function fetchData(isbnValue) {
 	// Prepare data if both the condition for HUTTERANCE and WHISPER are met 
 	let whisToken;  // Declare whisToken at a higher scope
 	if (hasWhisperEventType && hasUtteranceEventType) {
-		console.log("passato da qui:");
 		whisToken = data.ovon.events.find(event => event.eventType === "whisper").parameters.dialogEvent.features.text.tokens[0];
-		console.log("Whisper Token", whisToken);
+		// console.log("Whisper Token", whisToken);
 	}
 	  // Fetch data if the condition for UTTERANCE is met
 	let stringifiedDataUT = "";
@@ -398,7 +395,7 @@ function fetchData(isbnValue) {
 			try {
 				const { assistantResponse } = await askModel(question);
 				LLM_response = assistantResponse;
-				console.log("LLM Response:", LLM_response);
+				// console.log("LLM Response:", LLM_response);
 		
 				// Use LLM_response in fetchData
 			//	stringifiedDataUT = await fetchData(LLM_response);
@@ -438,8 +435,8 @@ function fetchData(isbnValue) {
 										startTime: new Date().toISOString()
 									},
 									features: {
-										json: {
-											mimeType: "application/json",
+										text: {
+											mimeType: "text/plain",
 											tokens: [{ value: stringifiedDataWhisper }]
 										}
 									}
@@ -472,8 +469,8 @@ function fetchData(isbnValue) {
 										startTime: new Date().toISOString()
 									},
 									features: {
-										json: {
-											mimeType: "application/json",
+										text: {
+											mimeType: "text/plain",
 											tokens: [{ value: JSON.stringify(LLM_response) }]
 										}
 									}
