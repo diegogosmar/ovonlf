@@ -98,22 +98,20 @@ button:hover {
 
 /* Footer Styling */
 footer {
-    text-align: center;
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
     padding: 20px;
     background-color: #f2f2f2;
-    position: fixed;
-    left: 0;
-    bottom: 0;
     width: 100%;
 }
 
 footer p {
     margin: 0;
-    color: #333; /* Adjust the color as needed */
-    font-size: 16px; /* Adjust the font size as needed */
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+    color: #333;
+    font-size: 16px;
+    position: static; /* Adjust position as needed */
 }
 
 footer img {
