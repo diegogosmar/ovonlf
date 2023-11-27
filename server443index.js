@@ -76,9 +76,23 @@ app.get('/', authenticate, (req, res) => {
 
 // AAA END
 
+// Prepare log file
+const logToFileWeb = (message) => {
+  try {
+      const timestamp = new Date().toISOString();
+      const logMessage = `${timestamp} - ${message}\n\n`;
+      fs.appendFileSync('web.log', logMessage, 'utf8');
+  } catch (error) {
+      console.error('Error writing to log file:', error);
+  }
+};
+
+
 app.post('/sendAction', async (req, res) => {
-    console.log('Request received on /sendAction');
-    console.log('Received Request:', req.body);
+    // Log the incoming request
+    logToFileWeb(`Received POST request on /sendAction: ${JSON.stringify(req.body)}`);
+    //console.log('Request received on /sendAction');
+    //console.log('Received Request:', req.body);
     const { userText, action, timest } = req.body; // Extract userText2 as well
 
     let postData;
@@ -261,7 +275,7 @@ app.post('/sendAction', async (req, res) => {
 
     // Set to false to create an agent that ignores SSL certificate errors
     const httpsAgent = new https.Agent({
-    rejectUnauthorized: true 
+    rejectUnauthorized: false 
 });
 
     try {
@@ -272,7 +286,9 @@ app.post('/sendAction', async (req, res) => {
             agent: httpsAgent  // Use the custom agent
         });
         const responseBody = await response.text();
-        //console.log("Response Body",responseBody);
+        // console.log("Response Body",responseBody);
+        // Log the response before sending it back
+        logToFileWeb(`Sent POST response for /sendAction: ${responseBody}`);
 
         const jsonResponse = JSON.parse(responseBody);
         res.json(jsonResponse);
@@ -340,16 +356,33 @@ function fetchData(isbnValue) {
 	  });
   }
   
+// Prepare log file
+const logToFile = (message) => {
+  try {
+      const timestamp = new Date().toISOString();
+      // Add a newline character at the end of each log message
+      const logMessage = `${timestamp} - ${message}\n\n`;
+      fs.appendFileSync('smlibrary.log', logMessage, 'utf8');
+  } catch (error) {
+      console.error('Error writing to log file:', error);
+  }
+};
+
+
   // app.post START on /smartlibrary endpoint
   app.post('/smartlibrary', async (req, res) => {
 	try {
+
+    // Log the incoming request
+    logToFile(`Received POST request on /smartlibrary: ${JSON.stringify(req.body)}`);
+
 	  const data = req.body;
 	  storedJsonData = data;
 	  jsonArray.push(data);
   
 	  const ovonConversationId = data.ovon.conversation.id;
 	  const ovonevent = data.ovon.events;
-	// console.log('ConversationId:', ovonConversationId);
+	 //console.log('ConversationId:', ovonConversationId);
 
 	// Check if data.ovon.events contains the eventType named "whisper"
 	const hasWhisperEventType = data.ovon.events.some(event => event.eventType === "whisper");
@@ -528,6 +561,8 @@ function fetchData(isbnValue) {
   
 	  // Log the result to the console
 	  //console.log(jsonString);
+    // Log the response before sending it back
+    logToFile(`Sent POST response for /smartlibrary: ${jsonString}`);
 
 	  // Send the jsonString as POST RESPONSE
 	  res.status(201).send(jsonString);
