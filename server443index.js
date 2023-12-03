@@ -564,7 +564,7 @@ const logToFile = (message) => {
     // Log the response before sending it back
     logToFile(`Sent POST response for /smartlibrary: ${jsonString}`);
 
-	  // Send the jsonString as POST RESPONSE
+	  // Send the jsonString as POST RESPONSE 201 success resource update
 	  res.status(201).send(jsonString);
 	} catch (error) {
 	  //console.error('Error:', error);
