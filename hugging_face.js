@@ -1,5 +1,5 @@
 // Smart Library OVON universal API examples //
-// SPDX-License-Identifier: MIT OR Apache-2.0 //
+// SPDX-License-Identifier: Apache-2.0 //
 // Diego Gosmar - 2023, 2024 //
 
 const fetch = require('node-fetch');
