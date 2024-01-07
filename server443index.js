@@ -102,7 +102,7 @@ app.post('/sendAction', async (req, res) => {
         postData = {
             "ovon": {
                 "schema": {
-                  "version": "1.0.1",
+                  "version": "0.9.0",
                   "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
                 },
                 "conversation": {
@@ -132,7 +132,7 @@ app.post('/sendAction', async (req, res) => {
         postData = {
             "ovon": {
                 "schema": {
-                  "version": "1.0.1",
+                  "version": "0.9.0",
                   "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
                 },
                 "conversation": {
@@ -171,7 +171,7 @@ app.post('/sendAction', async (req, res) => {
         postData = {
             "ovon": {
                 "schema": {
-                  "version": "1.0.1",
+                  "version": "0.9.0",
                   "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
                 },
                 "conversation": {
@@ -216,7 +216,7 @@ app.post('/sendAction', async (req, res) => {
         postData = {
             "ovon": {
                 "schema": {
-                  "version": "1.0.1",
+                  "version": "0.9.0",
                   "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
                 },
                 "conversation": {
