@@ -449,6 +449,10 @@ const logToFile = (message) => {
 		if (hasWhisperEventType && !hasUtteranceEventType) {
 			myJson = {
 				ovon: {
+          schema: {
+            "version": "0.9.0",
+            "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
+          },
 					conversation: {
 						id: ovonConversationId
 					},
@@ -483,6 +487,10 @@ const logToFile = (message) => {
 		} else if (hasUtteranceEventType) {
 			myJson = {
 				ovon: {
+          schema: {
+            "version": "0.9.0",
+            "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
+          },
 					conversation: {
 						id: ovonConversationId
 					},
@@ -519,6 +527,10 @@ const logToFile = (message) => {
 			myJson = {
 				// Default JSON structure
 				ovon: {
+          schema: {
+            "version": "0.9.0",
+            "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
+          },
 					conversation: {
 					  id: ovonConversationId
 					},
