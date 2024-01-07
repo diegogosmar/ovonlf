@@ -46,6 +46,7 @@ OVON Interoperable Conversation Envelope Specification, in order to provide an e
             <form id="inviteForm">
                 <textarea id="userText" maxlength="300"></textarea>
                 <button type="submit" name="action" value="invite">INVITE</button>
+                <button type="submit" name="action" value="bye">BYE</button>
                 <button type="submit" name="action" value="utterance">UTTERANCE</button>
             </form>
             <div id="inviteWaitingMessage" style="display: none;">Please wait...</div>
@@ -152,6 +153,43 @@ OVON Interoperable Conversation Envelope Specification, in order to provide an e
                 ]
             }
         };
+    } else if (action === 'bye') {
+        postData = {
+            "ovon": {
+                "schema": {
+                    "version": "0.9.0",
+                    "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
+                },
+                "conversation": {
+                    "id": "conv_" + timest
+                },
+                "sender": {
+                    "from": "https://organization_url_from",
+                    "reply-to": "https://organization_url_to"
+                },
+                "responseCode": 200,
+                "events": [
+                    {
+                        "eventType": "utterance",
+                        "parameters": {
+                            "dialogEvent": {
+                                "speakerId": "AssistantID",
+                                "span": { "startTime": new Date().toISOString() },
+                                "features": {
+                                    "text": {
+                                        "mimeType": "text/plain",
+                                        "tokens": [{ "value": userText }]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "eventType": "bye"
+                    }
+                ]
+            }
+        }
     }
 
     inviteWaitingMessageDiv.style.display = 'block'; // Show the waiting message

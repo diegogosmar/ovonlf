@@ -272,6 +272,13 @@ app.post('/sendAction', async (req, res) => {
                 ]
               }
             };
+    }   else if (action === 'bye') {
+        // Log the 'bye' action
+        logToFileWeb(`Received 'Bye' action: ${JSON.stringify(req.body)}`);
+
+        // Send a basic acknowledgment response
+        res.json({ message: "Bye action received and ignored" });
+        return; // Return to prevent further processing
     }
 
     // Set to false to create an agent that ignores SSL certificate errors
@@ -369,6 +376,8 @@ const logToFile = (message) => {
   }
 };
 
+// Check if data.ovon.events contains the eventType named "bye"
+const hasByeEventType = data => data.ovon.events.some(event => event.eventType === "bye");
 
   // app.post START on /smartlibrary endpoint
   app.post('/smartlibrary', async (req, res) => {
@@ -446,7 +455,12 @@ const logToFile = (message) => {
 	  // Preparing JSON RESPONSES
 
 		let myJson;
-		if (hasWhisperEventType && !hasUtteranceEventType) {
+          // Handle "Bye" event type
+          if (hasByeEventType(data)) {
+              // Respond with a simple message for "Bye" action
+              res.json({ message: "Bye action received and ignored" });
+              return; // Stop further processing
+          } else if (hasWhisperEventType && !hasUtteranceEventType) {
 			myJson = {
 				ovon: {
           schema: {
