@@ -618,6 +618,106 @@ app.get('/smartlibrary', (req, res) => {
    // }
   });
 
+// ORDER MNG section with RAG
+
+// Function to read from 'order.txt'
+async function readOrderFile() {
+  try {
+      const data = fs.readFileSync('order.txt', 'utf8');
+      return data;
+  } catch (err) {
+      console.error(err);
+      return '';
+  }
+}
+
+// Function to process the model's response and extract the relevant part
+function processModelResponse(fullResponse, question) {
+  const splitResponse = fullResponse.split(question).pop();
+  return splitResponse ? splitResponse.trim() : '';
+}
+
+// Function to process the order info request using Hugging Face model
+async function processOrderInfoRequest(request) {
+  const orderData = await readOrderFile();
+
+  if (orderData) {
+      //concatenate the request (prompt) with the contect (content of the order text)
+      const combinedInput = `${request.toString()}\n\n${orderData.toString()}`;
+
+      const response = await askModel(combinedInput);
+      if (response && response.fullResponse) {
+          // Process the full response to extract only the answer
+          return processModelResponse(response.fullResponse, combinedInput);
+      } else {
+          console.error("Unexpected response format from askModel:", response);
+          return "Error: Unexpected response format.";
+      }
+  } else {
+      throw new Error('No order data available');
+  }
+}
+
+// New endpoint for 'orderinfo'
+app.post('/orderinfo', async (req, res) => {
+  try {
+      const orderToken = req.body.ovon.events.find(event => event.eventType === "utterance").parameters.dialogEvent.features.text.tokens[0];
+      // detect and set the request received via POST in the OVON token value
+      const orderInfoRequest = orderToken && orderToken.value;
+
+      if (!orderInfoRequest) {
+          throw new Error('Order information not found in the request');
+      }
+
+      const orderInfoResponse = await processOrderInfoRequest(orderInfoRequest);
+
+      const ovonResponse = {
+          ovon: {
+              schema: {
+                  version: "0.9.0",
+                  url: "https://openvoicenetwork.org/schema/dialog-envelope.json"
+              },
+              conversation: {
+                  id: req.body.ovon.conversation.id
+              },
+              sender: {
+                  from: "https://yourserver.com/orderinfo"
+              },
+              responseCode: {
+                  code: 200,
+                  description: "OK"
+              },
+              events: [
+                  {
+                      eventType: "orderInfoResponse",
+                      parameters: {
+                          dialogEvent: {
+                              speakerId: "assistant",
+                              span: {
+                                  startTime: new Date().toISOString()
+                              },
+                              features: {
+                                  text: {
+                                      mimeType: "text/plain",
+                                      tokens: [{ value: orderInfoResponse }]
+                                  }
+                              }
+                          }
+                      }
+                  }
+              ]
+          }
+      };
+
+      res.status(200).json(ovonResponse);
+  } catch (error) {
+      console.error('Error in /orderinfo:', error);
+      res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
 // SSL/TLS Certificates paths
 const privateKey = fs.readFileSync('../certificates/your_key.key', 'utf8');
 const certificate = fs.readFileSync('../certificates/your_cert.crt', 'utf8');
