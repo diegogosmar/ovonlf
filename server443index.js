@@ -665,6 +665,17 @@ function logMessage(message) {
   fs.appendFileSync('orderinfo.log', logEntry, 'utf8');
 }
 
+// Function to log messages every express received request
+app.use((req, res, next) => {
+  const logEntry = `Raw request received at ${new Date().toISOString()}: ${JSON.stringify(req.body)}\n`;
+  fs.appendFile('requests.log', logEntry, (err) => {
+      if (err) {
+          console.error('Error writing to log file', err);
+      }
+  });
+  next();
+});
+
 // New endpoint for 'orderinfo'
 app.post('/orderinfo', async (req, res) => {
   try {
@@ -722,7 +733,7 @@ app.post('/orderinfo', async (req, res) => {
   
   // Log successful response
   logMessage(`Successfully processed request: ${JSON.stringify(ovonResponse)}`);
-  
+
       res.status(200).json(ovonResponse);
   } catch (error) {
       console.error('Error in /orderinfo:', error);
