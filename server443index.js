@@ -658,9 +658,20 @@ async function processOrderInfoRequest(request) {
   }
 }
 
+// Function to log messages to 'orderinfo.log'
+function logMessage(message) {
+  const timestamp = new Date().toISOString();
+  const logEntry = `${timestamp} - ${message}\n`;
+  fs.appendFileSync('orderinfo.log', logEntry, 'utf8');
+}
+
 // New endpoint for 'orderinfo'
 app.post('/orderinfo', async (req, res) => {
   try {
+
+      // Log the incoming request
+      logMessage(`Received POST request: ${JSON.stringify(req.body)}`);
+
       const orderToken = req.body.ovon.events.find(event => event.eventType === "utterance").parameters.dialogEvent.features.text.tokens[0];
       // detect and set the request received via POST in the OVON token value
       const orderInfoRequest = orderToken && orderToken.value;
@@ -708,13 +719,17 @@ app.post('/orderinfo', async (req, res) => {
               ]
           }
       };
-
+  
+  // Log successful response
+  logMessage(`Successfully processed request: ${JSON.stringify(ovonResponse)}`);
+  
       res.status(200).json(ovonResponse);
   } catch (error) {
       console.error('Error in /orderinfo:', error);
       res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 
