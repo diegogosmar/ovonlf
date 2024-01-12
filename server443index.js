@@ -694,6 +694,9 @@ app.post('/orderinfo', async (req, res) => {
       // Decode the encoded order information request
       const orderInfoRequest = decodeURIComponent(orderInfoRequestEncoded);
 
+      // Log the decoded request (without %20)
+      logMessage(`Decoded POST request: ${orderInfoRequest}`);
+
       const orderInfoResponse = await processOrderInfoRequest(orderInfoRequest);
 
       const ovonResponse = {
