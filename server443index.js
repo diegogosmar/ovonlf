@@ -683,13 +683,16 @@ app.post('/orderinfo', async (req, res) => {
       // Log the incoming request
       logMessage(`Received POST request: ${JSON.stringify(req.body)}`);
 
+      // Extract the orderToken from the request
       const orderToken = req.body.ovon.events.find(event => event.eventType === "utterance").parameters.dialogEvent.features.text.tokens[0];
-      // detect and set the request received via POST in the OVON token value
-      const orderInfoRequest = orderToken && orderToken.value;
+      const orderInfoRequestEncoded = orderToken && orderToken.value;
 
-      if (!orderInfoRequest) {
-          throw new Error('Order information not found in the request');
-      }
+      if (!orderInfoRequestEncoded) {
+        throw new Error('Order information not found in the request');
+        }
+
+      // Decode the encoded order information request
+      const orderInfoRequest = decodeURIComponent(orderInfoRequestEncoded);
 
       const orderInfoResponse = await processOrderInfoRequest(orderInfoRequest);
 
