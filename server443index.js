@@ -699,6 +699,9 @@ app.post('/orderinfo', async (req, res) => {
 
       const orderInfoResponse = await processOrderInfoRequest(orderInfoRequest);
 
+      // Log the decoded request (without %20)
+      logMessage(`Process Info request: ${orderInfoResponse}`);
+
       const ovonResponse = {
           ovon: {
               schema: {
