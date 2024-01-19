@@ -781,13 +781,24 @@ const { askModelOpenAI, askModelOpenAIOrder } = require('./openai.js'); // OpenA
 
 app.use(bodyParser.json());
 
+// Prepare log file for smartagent inside smagent.log
+const logToFileAgent = (message) => {
+  try {
+      const timestamp = new Date().toISOString();
+      const logMessage = `${timestamp} - ${message}\n\n`;
+      fs.appendFileSync('smagent.log', logMessage, 'utf8');
+  } catch (error) {
+      console.error('Error writing to log file:', error);
+  }
+};
+
 // Duplicate and modify the /smartlibrary endpoint for OpenAI
 app.post('/smartagent', apiKeyAuthSync, async (req, res) => {
 
     try {
         
     // Log the incoming request
-    logToFile(`Received POST request on /smartagent: ${JSON.stringify(req.body)}`);
+    logToFileAgent(`Received POST request on /smartagent: ${JSON.stringify(req.body)}`);
 
 	  const data = req.body;
 	  storedJsonData = data;
@@ -998,15 +1009,15 @@ console.log("Stringified Response:", jsonString);
 // Log the result to the console
 //console.log(jsonString);
 // Log the response before sending it back
-logToFile(`Sent POST response for /smartagent: ${jsonString}`);
+logToFileAgent(`Sent POST response for /smartagent: ${JSON.stringify(myJson)}`);
 
 // Send the jsonString as POST RESPONSE 201 success resource update
 res.status(201).send(jsonString);
 } catch (error) {
-//console.error('Error:', error);
-res.status(500).send('Internal Server Error');
+    // Log error to smagent.log
+    logToFileAgent(`Error in /smartagent: ${error}`);
+    res.status(500).send('Internal Server Error');
 }
-
 });
 
 // POST Management END
