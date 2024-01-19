@@ -264,14 +264,9 @@ J.K. Rowling, whose full name is Joanne Rowling, is a British author, philanthro
 producer, and television writer. She rose to fame in the late 1990s as the author of the Harry Potter fantasy series,
 which has sold over 500 million copies worldwide, making\""}]}}}}}]}}
 
-## WEB APP
-A full web page is available to try the API.<br>
-It requires some kind of basic Authentication to access.<br>
-pm2 start server443index.js<br>
+## Usage
 
-Access:<br>
-https://your_domain
-<br>
+pm2 start server443index.js<br>
 
 ## Miscellaneus
 <br>
