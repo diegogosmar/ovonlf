@@ -307,7 +307,7 @@ app.post('/sendAction', async (req, res) => {
 });
 
 
-// WEB SERVICES MANAGEMENT 
+// WEB SERVICES MANAGEMENT Hugging_Face Model
 
 const { askModel } = require('./hugging_face'); // Adjust the path if necessary
 
@@ -753,7 +753,367 @@ app.post('/orderinfo', async (req, res) => {
 });
 
 
+// WEB SERVICES MANAGEMENT OpenAI Model (pro)
 
+const { askModelOpenAI } = require('./openai.js'); // OpenAI GPT-4 model - Adjust the path if necessary
+
+app.use(bodyParser.json());
+
+// Duplicate and modify the /smartlibrary endpoint for OpenAI
+app.post('/smartlibrarypro', async (req, res) => {
+
+    try {
+        
+    // Log the incoming request
+    logToFile(`Received POST request on /smartlibrarypro: ${JSON.stringify(req.body)}`);
+
+	  const data = req.body;
+	  storedJsonData = data;
+	  jsonArray.push(data);
+
+    let cleanedResponse = ""; // Declare the variable
+  
+	  const ovonConversationId = data.ovon.conversation.id;
+	  const ovonevent = data.ovon.events;
+	 //console.log('ConversationId:', ovonConversationId);
+
+	// Check if data.ovon.events contains the eventType named "whisper"
+	const hasWhisperEventType = data.ovon.events.some(event => event.eventType === "whisper");
+	//console.log('Has Whisper:', hasWhisperEventType);
+
+    // Check if data.ovon.events contains the eventType named "utterance"
+    const hasUtteranceEventType = data.ovon.events.some(event => event.eventType === "utterance");
+	//console.log('Has Utterance:', hasUtteranceEventType);
+
+	  // Fetch data if ONLY the condition for WHISPER is met (intended for pure ISBN queries) 
+	  let stringifiedDataWhisper = "";
+	if (hasWhisperEventType && !hasUtteranceEventType) {
+		const isbnToken = data.ovon.events.find(event => event.eventType === "whisper").parameters.dialogEvent.features.text.tokens[0];
+		const isbnValue = isbnToken && isbnToken.value;
+  
+		if (isbnValue) {
+		  stringifiedDataWhisper = await fetchData(isbnValue);
+		  //console.log("isbnValue Data:", stringifiedDataWhisper);
+		} else {
+		  //console.log("ISBN_value not found in the JSON.");
+		}
+	}
+
+	// Prepare data if both the condition for HUTTERANCE and WHISPER are met 
+	let whisToken;  // Declare whisToken at a higher scope
+	if (hasWhisperEventType && hasUtteranceEventType) {
+		whisToken = data.ovon.events.find(event => event.eventType === "whisper").parameters.dialogEvent.features.text.tokens[0];
+		// console.log("Whisper Token", whisToken);
+	}
+	  // Fetch data if the condition for UTTERANCE is met
+	let stringifiedDataUT = "";
+	
+	if (hasUtteranceEventType) {
+		const questionToken = data.ovon.events.find(event => event.eventType === "utterance").parameters.dialogEvent.features.text.tokens[0];
+		let question = questionToken && questionToken.value;
+	
+		if (hasWhisperEventType) {
+			question += " " + whisToken.value; // Concatenate stringifiedDataWhisper to question
+			// console.log("question concat:", question);
+		}
+
+        if (question) {
+          try {
+            const response = await askModelOpenAI(question); // Using OpenAI's GPT-4
+            const LLM_response = response.assistantResponse;
+            // Log the assistantResponse
+            console.log('LLM_response', LLM_response);
+            // Replace special characters and double quotes with spaces
+            cleanedResponse = LLM_response.replace(/[^\w\s]+/g, ' ').trim();
+            console.log('cleanedResponse', cleanedResponse);
+
+          } catch (error) {
+            console.error(error);
+          }
+        } else {
+          console.log("UTTERANCE_value not found in the JSON.");
+        }
+        
+      }
+
+    // Preparing JSON RESPONSES
+
+		let myJson;
+    // Handle "Bye" event type
+    if (hasByeEventType(data)) {
+        // Respond with a simple message for "Bye" action
+        res.json({ message: "Bye action received and ignored" });
+        return; // Stop further processing
+    } else if (hasWhisperEventType && !hasUtteranceEventType) {
+myJson = {
+  ovon: {
+    schema: {
+      "version": "0.9.0",
+      "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
+    },
+    conversation: {
+      id: ovonConversationId
+    },
+    sender: {
+      from: "Smart Library APIs"
+    },
+    responseCode: {
+      "code": 200,
+      "description": "OK"
+    },
+    events: [
+      {
+        eventType: "utterance",
+        parameters: {
+          dialogEvent: {
+            speakerId: "assistant",
+            span: {
+              startTime: new Date().toISOString()
+            },
+            features: {
+              text: {
+                mimeType: "text/plain",
+                tokens: [{ value: stringifiedDataWhisper }]
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+};
+} else if (hasUtteranceEventType) {
+myJson = {
+  ovon: {
+    schema: {
+      "version": "0.9.0",
+      "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
+    },
+    conversation: {
+      id: ovonConversationId
+    },
+    sender: {
+      from: "Smart Library APIs"
+    },
+    responseCode: {
+      "code": 200,
+      "description": "OK"
+    },
+    events: [
+      {
+        eventType: "utterance",
+        parameters: {
+          dialogEvent: {
+            speakerId: "assistant",
+            span: {
+              startTime: new Date().toISOString()
+            },
+            features: {
+              text: {
+                mimeType: "text/plain",
+                //tokens: [{ value: "test" }]
+                tokens: [{ value: JSON.stringify(cleanedResponse) }]
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+};
+} else {
+// Default logic or response for scenarios other than whisper or utterance
+myJson = {
+  // Default JSON structure
+  ovon: {
+    schema: {
+      "version": "0.9.0",
+      "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
+    },
+    conversation: {
+      id: ovonConversationId
+    },
+    sender: {
+      from: "https://ovon.xcally.com"
+    },
+    responseCode: {
+      "code": 200,
+      "description": "OK"
+    },
+    events: [
+      {
+      eventType: "utterance",
+      parameters: {
+        dialogEvent: {
+        speakerId: "assistant",
+        span: {
+          startTime: new Date().toISOString()
+        },
+        features: {
+          text: {
+          mimeType: "text/plain",
+          tokens: [
+            {
+            value: "Welcome to the OVON Smart Library service! I can look up information about books if you provide a valid ISBN number with a Whisper. If you prefer, you can also send me a Natural Language utterance and I'll reply you!"
+            }
+          ]
+          }
+        }
+        }
+      }
+      }
+    ]
+    }
+};
+};
+
+
+console.log("Response:", myJson);
+// Convert the JSON object to a string for display or transmission
+const jsonString = JSON.stringify(myJson);
+console.log("Stringified Response:", jsonString);
+
+// Log the result to the console
+//console.log(jsonString);
+// Log the response before sending it back
+logToFile(`Sent POST response for /smartlibrarypro: ${jsonString}`);
+
+// Send the jsonString as POST RESPONSE 201 success resource update
+res.status(201).send(jsonString);
+} catch (error) {
+//console.error('Error:', error);
+res.status(500).send('Internal Server Error');
+}
+
+});
+
+// POST Management END
+
+// Define the route for handling GET requests to '/smartlibrary'
+app.get('/smartlibrarypro', (req, res) => {
+  // Check if there is stored JSON data
+  //if (storedJsonData) {
+    // Convert the stored JSON data to a string
+    //const jsonStringGet = JSON.stringify(storedJsonData);
+
+    // Send the JSON data as the response
+    //res.status(200).send(jsonStringGet);
+ // } else {
+    // If no data is stored, send an appropriate response
+    // For the moment do not allow this method
+    res.status(404).send('Method Not Allowed');
+ // }
+});
+
+//
+
+
+// ORDER MNG RAG with OpenAI
+
+function processOpenAIModelResponse(response) {
+  // Check if the expected properties exist in the response
+  if (response && response.fullResponse && response.assistantResponse) {
+      return response.assistantResponse;
+  } else {
+      console.error("Unexpected response format from OpenAI model:", response);
+      return "Error: Unexpected response format from OpenAI model.";
+  }
+}
+
+
+async function processOrderInfoRequest(request, useOpenAI = false) {
+  const orderData = await readOrderFile();
+
+  if (orderData) {
+      const combinedInput = `${request.toString()}\n\n${orderData.toString()}`;
+
+      if (useOpenAI) {
+          const response = await askModelOpenAI(combinedInput);
+          return processOpenAIModelResponse(response);
+      } else {
+          const response = await askModel(combinedInput);
+          if (response && response.fullResponse) {
+              return processModelResponse(response.fullResponse, combinedInput);
+          } else {
+              console.error("Unexpected response format from Hugging Face model:", response);
+              return "Error: Unexpected response format.";
+          }
+      }
+  } else {
+      throw new Error('No order data available');
+  }
+}
+
+app.post('/orderinfopro', async (req, res) => {
+  try {
+      // Log the incoming request
+      logMessage(`Received POST request on /orderinfopro: ${JSON.stringify(req.body)}`);
+
+      // Extract the orderToken from the request
+      const orderToken = req.body.ovon.events.find(event => event.eventType === "utterance").parameters.dialogEvent.features.text.tokens[0];
+      const orderInfoRequestEncoded = orderToken && orderToken.value;
+
+      if (!orderInfoRequestEncoded) {
+          throw new Error('Order information not found in the request');
+      }
+
+      const orderInfoRequest = decodeURIComponent(orderInfoRequestEncoded);
+      logMessage(`Decoded POST request: ${orderInfoRequest}`);
+
+      // Use OpenAI's model for this endpoint
+      const orderInfoResponse = await processOrderInfoRequest(orderInfoRequest, true);
+
+      logMessage(`Process Info request: ${orderInfoResponse}`);
+
+      // Construct the response as per your original structure
+      const ovonResponse = {
+        ovon: {
+            schema: {
+                version: "0.9.0",
+                url: "https://openvoicenetwork.org/schema/dialog-envelope.json"
+            },
+            conversation: {
+                id: req.body.ovon.conversation.id
+            },
+            sender: {
+                from: "https://yourserver.com/orderinfopro"
+            },
+            responseCode: {
+                code: 200,
+                description: "OK"
+            },
+            events: [
+                {
+                    eventType: "orderInfoResponse",
+                    parameters: {
+                        dialogEvent: {
+                            speakerId: "assistant",
+                            span: {
+                                startTime: new Date().toISOString()
+                            },
+                            features: {
+                                text: {
+                                    mimeType: "text/plain",
+                                    tokens: [{ value: orderInfoResponse }]
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    };    
+
+      logMessage(`Successfully processed request for /orderinfopro: ${JSON.stringify(ovonResponse)}`);
+      res.status(200).json(ovonResponse);
+  } catch (error) {
+      console.error('Error in /orderinfopro:', error);
+      res.status(500).send('Internal Server Error');
+  }
+});
+
+
+//
 
 // SSL/TLS Certificates paths
 const privateKey = fs.readFileSync('../certificates/your_key.key', 'utf8');
