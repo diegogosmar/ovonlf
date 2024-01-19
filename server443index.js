@@ -12,6 +12,28 @@ const app = express();
 const port = 443;
 const https = require('https');
 
+// Function to read API Key synchronously for Agent PRO usage
+function readApiKeySync() {
+  try {
+      const apiKey = fs.readFileSync('../api_key.txt', 'utf8'); // Adjust the file path as necessary
+      return apiKey.trim();
+  } catch (error) {
+      console.error('Error reading API key file:', error);
+      return null;
+  }
+}
+
+// Middleware for API Key Authentication
+function apiKeyAuthSync(req, res, next) {
+  const apiKey = readApiKeySync();
+  const requestApiKey = req.header('API_Key');
+
+  if (!apiKey || requestApiKey !== apiKey) {
+      return res.status(401).send('Unauthorized: Invalid API Key');
+  }
+  next();
+}
+
 // URL as a constant for easy modification
 //const externalApiUrl = 'https://localhost/smartlibrary';
 const externalApiUrl = 'https://ovon.xcally.com/smartlibrary';
@@ -760,7 +782,7 @@ const { askModelOpenAI, askModelOpenAIOrder } = require('./openai.js'); // OpenA
 app.use(bodyParser.json());
 
 // Duplicate and modify the /smartlibrary endpoint for OpenAI
-app.post('/smartagent', async (req, res) => {
+app.post('/smartagent', apiKeyAuthSync, async (req, res) => {
 
     try {
         
