@@ -760,12 +760,12 @@ const { askModelOpenAI, askModelOpenAIOrder } = require('./openai.js'); // OpenA
 app.use(bodyParser.json());
 
 // Duplicate and modify the /smartlibrary endpoint for OpenAI
-app.post('/smartlibrarypro', async (req, res) => {
+app.post('/smartagent', async (req, res) => {
 
     try {
         
     // Log the incoming request
-    logToFile(`Received POST request on /smartlibrarypro: ${JSON.stringify(req.body)}`);
+    logToFile(`Received POST request on /smartagent: ${JSON.stringify(req.body)}`);
 
 	  const data = req.body;
 	  storedJsonData = data;
@@ -976,7 +976,7 @@ console.log("Stringified Response:", jsonString);
 // Log the result to the console
 //console.log(jsonString);
 // Log the response before sending it back
-logToFile(`Sent POST response for /smartlibrarypro: ${jsonString}`);
+logToFile(`Sent POST response for /smartagent: ${jsonString}`);
 
 // Send the jsonString as POST RESPONSE 201 success resource update
 res.status(201).send(jsonString);
@@ -990,22 +990,25 @@ res.status(500).send('Internal Server Error');
 // POST Management END
 
 // Define the route for handling GET requests to '/smartlibrary'
-app.get('/smartlibrarypro', (req, res) => {
-  // Check if there is stored JSON data
-  //if (storedJsonData) {
-    // Convert the stored JSON data to a string
-    //const jsonStringGet = JSON.stringify(storedJsonData);
-
-    // Send the JSON data as the response
-    //res.status(200).send(jsonStringGet);
- // } else {
-    // If no data is stored, send an appropriate response
-    // For the moment do not allow this method
+app.get('/smartagent', (req, res) => {
     res.status(404).send('Method Not Allowed');
  // }
 });
 
-//
+app.get('/smartlibrary', (req, res) => {
+  res.status(404).send('Method Not Allowed');
+// }
+});
+
+app.get('/smartorder', (req, res) => {
+  res.status(404).send('Method Not Allowed');
+// }
+});
+
+app.get('/smartorderpro', (req, res) => {
+  res.status(404).send('Method Not Allowed');
+// }
+});
 
 
 // ORDER MNG RAG with OpenAI
