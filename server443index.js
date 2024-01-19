@@ -1080,7 +1080,7 @@ async function processOrderInfoRequest(request, useOpenAI = false) {
   }
 }
 
-app.post('/orderinfopro', async (req, res) => {
+app.post('/orderinfopro', apiKeyAuthSync, async (req, res) => {
   try {
       // Log the incoming request
       logMessage(`Received POST request on /orderinfopro: ${JSON.stringify(req.body)}`);
