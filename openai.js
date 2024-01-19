@@ -74,8 +74,6 @@ async function askModelOpenAI(question) {
     }
 }
 
-module.exports = { askModelOpenAI };
-
 // New model specialized in ORDER info
 
 async function askModelOpenAIOrder(orderQuestion) {
@@ -101,5 +99,6 @@ async function askModelOpenAIOrder(orderQuestion) {
     }
 }
 
-module.exports = { askModelOpenAIOrder };
+// Exporting models
+module.exports = { askModelOpenAI, askModelOpenAIOrder };
 

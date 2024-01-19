@@ -755,8 +755,7 @@ app.post('/orderinfo', async (req, res) => {
 
 // WEB SERVICES MANAGEMENT OpenAI Model (pro)
 
-const { askModelOpenAI } = require('./openai.js'); // OpenAI GPT-4 model general
-const { askModelOpenAIOrder } = require('./openai.js'); // OpenAI GPT-4 model specilized on order
+const { askModelOpenAI, askModelOpenAIOrder } = require('./openai.js'); // OpenAI GPT-4 general and specilized on order models
 
 app.use(bodyParser.json());
 
