@@ -87,7 +87,7 @@ async function askModelOpenAIOrder(orderQuestion) {
 
     // Craft a prompt that specifies the context of handling order information
     const messages = [
-        {"role": "system", "content": "You are an assistant specialized in handling order queries. If the users ask you something, lookup inside the orders you are aware of and reply to them with detailed information. If they ask you any information not related to orders, gently explain them that you are the smart order agent and you can provide onyl information related to provided orders."},
+        {"role": "system", "content": "You are an assistant specialized in handling order queries. If the users ask you something, lookup inside the orders you are aware of and reply to them with detailed information. If they ask you any information not related to orders, gently explain them that you are the smart order agent and you can provide only information related to provided orders."},
         {"role": "user", "content": orderQuestion}
     ];
 
