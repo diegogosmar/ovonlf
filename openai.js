@@ -75,3 +75,31 @@ async function askModelOpenAI(question) {
 }
 
 module.exports = { askModelOpenAI };
+
+// New model specialized in ORDER info
+
+async function askModelOpenAIOrder(orderQuestion) {
+    const apiKey = await getApiKey();
+    if (!apiKey) {
+        console.error('API key is not available');
+        return null;
+    }
+
+    // Craft a prompt that specifies the context of handling order information
+    const messages = [
+        {"role": "system", "content": "You are an assistant specialized in handling order queries. If the users ask you something, lookup inside the orders you are aware of and reply to them with detailed information. If they ask you any information not related to orders, gently explain them that you are the smart order agent and you can provide onyl information related to provided orders."},
+        {"role": "user", "content": orderQuestion}
+    ];
+
+    const response = await queryModelOpenAI(messages, apiKey);
+    if (response && response.choices && response.choices.length > 0) {
+        // Extracting the assistant's response
+        const assistantResponse = response.choices[0].message.content;
+        return { fullResponse: response, assistantResponse };
+    } else {
+        return { fullResponse: response, assistantResponse: null };
+    }
+}
+
+module.exports = { askModelOpenAIOrder };
+

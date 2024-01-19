@@ -755,7 +755,8 @@ app.post('/orderinfo', async (req, res) => {
 
 // WEB SERVICES MANAGEMENT OpenAI Model (pro)
 
-const { askModelOpenAI } = require('./openai.js'); // OpenAI GPT-4 model - Adjust the path if necessary
+const { askModelOpenAI } = require('./openai.js'); // OpenAI GPT-4 model general
+const { askModelOpenAIOrder } = require('./openai.js'); // OpenAI GPT-4 model specilized on order
 
 app.use(bodyParser.json());
 
@@ -1028,7 +1029,7 @@ async function processOrderInfoRequest(request, useOpenAI = false) {
       const combinedInput = `${request.toString()}\n\n${orderData.toString()}`;
 
       if (useOpenAI) {
-          const response = await askModelOpenAI(combinedInput);
+          const response = await askModelOpenAIOrder(combinedInput);
           return processOpenAIModelResponse(response);
       } else {
           const response = await askModel(combinedInput);
