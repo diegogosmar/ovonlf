@@ -60,7 +60,7 @@ async function askModelOpenAI(question) {
     }
 
     const messages = [
-        {"role": "system", "content": "You are a knowledgeable chatbot."},
+        {"role": "system", "content": "You are a library assistant specialized in handling books and author queries. If the users ask you anything about books or authors, reply to them with detailed information. If they ask you any other kind of information , gently explain that you are the smart library agent and you can provide only information related to books or authors."},
         {"role": "user", "content": question}
     ];
 
