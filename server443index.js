@@ -460,7 +460,8 @@ const hasByeEventType = data => data.ovon.events.some(event => event.eventType =
       // Decode the question to replace non-ASCII character with space (i.e. %20, %21,...)
       question = decodeURIComponent(question);
 			try {
-				const { assistantResponse } = await askModel(question);
+				//const { assistantResponse } = await askModel(question);
+        const { assistantResponse } = await askModelOpenAI(question);
 				LLM_response = assistantResponse;
 				// console.log("LLM Response:", LLM_response);
 		
@@ -628,16 +629,6 @@ const hasByeEventType = data => data.ovon.events.some(event => event.eventType =
 
 // Define the route for handling GET requests to '/smartlibrary'
 app.get('/smartlibrary', (req, res) => {
-    // Check if there is stored JSON data
-    //if (storedJsonData) {
-      // Convert the stored JSON data to a string
-      //const jsonStringGet = JSON.stringify(storedJsonData);
-  
-      // Send the JSON data as the response
-      //res.status(200).send(jsonStringGet);
-   // } else {
-      // If no data is stored, send an appropriate response
-      // For the moment do not allow this method
       res.status(404).send('Method Not Allowed');
    // }
   });
