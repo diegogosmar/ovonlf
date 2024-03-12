@@ -460,9 +460,9 @@ const hasByeEventType = data => data.ovon.events.some(event => event.eventType =
       // Decode the question to replace non-ASCII character with space (i.e. %20, %21,...)
       question = decodeURIComponent(question);
 			try {
-				// Using HugFace model
-        const { assistantResponse } = await askModel(question);
-        //const { assistantResponse } = await askModelOpenAI(question);
+				// Using HugFace model or OpenAI model
+        //const { assistantResponse } = await askModel(question);
+        const { assistantResponse } = await askModelOpenAI(question);
 				LLM_response = assistantResponse;
 				// console.log("LLM Response:", LLM_response);
 		
