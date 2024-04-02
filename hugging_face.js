@@ -80,4 +80,32 @@ async function askModel(question) {
     }
 }
 
-module.exports = { askModel };
+async function askModelBank(question) {
+    const messages = [
+        {
+            "role": "system",
+            "content": "You are a library assistant specialized in Bank of America information. If the users ask you anything about their Bank of America accounts, reply to them with detailed information you can get from the prompt. If they ask you any other kind of information , gently explain that you are the smart bank agent and you can provide only information related to bank and finance.",
+        },
+        {"role": "user", "content": question}
+    ];
+    const prompt = messages.map(msg => `${msg.role}: ${msg.content}`).join('\n');
+
+    try {
+        const apiKey = await getApiKey();
+        if (!apiKey) {
+            throw new Error('API key is not available');
+        }
+
+        const fullResponse = await queryModel(prompt, apiKey);
+        const assistantResponseStart = fullResponse.lastIndexOf("assistant:") + "assistant:".length;
+        const assistantResponse = fullResponse.substring(assistantResponseStart).trim();
+
+        return { fullResponse, assistantResponse };
+    } catch (error) {
+        console.error('Error in askModel function:', error);
+        return { fullResponse: null, assistantResponse: null };
+    }
+}
+
+module.exports = { askModel, askModelBank };
+

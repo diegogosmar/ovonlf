@@ -99,6 +99,31 @@ async function askModelOpenAIOrder(orderQuestion) {
     }
 }
 
+// New model specialized in Bank info
+
+async function askModelOpenAIBank(bankQuestion) {
+    const apiKey = await getApiKey();
+    if (!apiKey) {
+        console.error('API key is not available');
+        return null;
+    }
+
+    // Craft a prompt that specifies the context of handling order information
+    const messages = [
+        {"role": "system", "content": "You are an assistant specialized in Bank of America information. If the users ask you anything about their Bank of America accounts, reply to them with detailed information you can get from the prompt. If they ask you any other kind of information , gently explain that you are the smart bank agent and you can provide only information related to bank and finance."},
+        {"role": "user", "content": bankQuestion}
+    ];
+
+    const response = await queryModelOpenAI(messages, apiKey);
+    if (response && response.choices && response.choices.length > 0) {
+        // Extracting the assistant's response
+        const assistantResponse = response.choices[0].message.content;
+        return { fullResponse: response, assistantResponse };
+    } else {
+        return { fullResponse: response, assistantResponse: null };
+    }
+}
+
 // Exporting models
-module.exports = { askModelOpenAI, askModelOpenAIOrder };
+module.exports = { askModelOpenAI, askModelOpenAIOrder, askModelOpenAIBank };
 

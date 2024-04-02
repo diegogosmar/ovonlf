@@ -766,10 +766,144 @@ app.post('/orderinfo', async (req, res) => {
   }
 });
 
+// BANK MNG section with RAG
+
+const { askModelBank } = require('./hugging_face');
+
+// Function to read from 'bank.txt'
+async function readBankFile() {
+  try {
+      const data = fs.readFileSync('bank.txt', 'utf8');
+      return data;
+  } catch (err) {
+      console.error(err);
+      return '';
+  }
+}
+
+// Function to process the model's response and extract the relevant part
+function processModelResponse(fullResponse, question) {
+  const splitResponse = fullResponse.split(question).pop();
+  return splitResponse ? splitResponse.trim() : '';
+}
+
+// Function to process the bank info request using Hugging Face model
+async function processBankInfoRequest(request) {
+  const bankData = await readBankFile();
+
+  if (bankData) {
+      //concatenate the request (prompt) with the contect (content of the bank text)
+      const combinedInput = `${request.toString()}\n\n${bankData.toString()}`;
+
+      const response = await askModelBank(combinedInput);
+      if (response && response.fullResponse) {
+          // Process the full response to extract only the answer
+          return processModelResponse(response.fullResponse, combinedInput);
+      } else {
+          console.error("Unexpected response format from askModel:", response);
+          return "Error: Unexpected response format.";
+      }
+  } else {
+      throw new Error('No bank data available');
+  }
+}
+
+// Function to log messages to 'bankinfo.log'
+function logMessage(message) {
+  const timestamp = new Date().toISOString();
+  const logEntry = `${timestamp} - ${message}\n`;
+  fs.appendFileSync('bankinfo.log', logEntry, 'utf8');
+}
+
+// Function to log messages every express received request
+app.use((req, res, next) => {
+  const logEntry = `Raw request received at ${new Date().toISOString()}: ${JSON.stringify(req.body)}\n`;
+  fs.appendFile('requests.log', logEntry, (err) => {
+      if (err) {
+          console.error('Error writing to log file', err);
+      }
+  });
+  next();
+});
+
+// New endpoint for 'bankinfo'
+app.post('/bankinfo', async (req, res) => {
+  try {
+
+      // Log the incoming request
+      logMessage(`Received POST request: ${JSON.stringify(req.body)}`);
+
+      // Extract the bankToken from the request
+      const bankToken = req.body.ovon.events.find(event => event.eventType === "utterance").parameters.dialogEvent.features.text.tokens[0];
+      const bankInfoRequestEncoded = bankToken && bankToken.value;
+
+      if (!bankInfoRequestEncoded) {
+        throw new Error('Bank information not found in the request');
+        }
+
+      // Decode the encoded bank information request
+      const bankInfoRequest = decodeURIComponent(bankInfoRequestEncoded);
+
+      // Log the decoded request (without %20)
+      logMessage(`Decoded POST request: ${bankInfoRequest}`);
+
+      const bankInfoResponse = await processBankInfoRequest(bankInfoRequest);
+
+      // Log the decoded request (without %20)
+      logMessage(`Process Info request: ${bankInfoResponse}`);
+
+      const ovonResponse = {
+          ovon: {
+              schema: {
+                  version: "0.9.0",
+                  url: "https://openvoicenetwork.org/schema/dialog-envelope.json"
+              },
+              conversation: {
+                  id: req.body.ovon.conversation.id
+              },
+              sender: {
+                  from: "https://yourserver.com/bankinfo"
+              },
+              responseCode: {
+                  code: 200,
+                  description: "OK"
+              },
+              events: [
+                  {
+                      eventType: "bankInfoResponse",
+                      parameters: {
+                          dialogEvent: {
+                              speakerId: "assistant",
+                              span: {
+                                  startTime: new Date().toISOString()
+                              },
+                              features: {
+                                  text: {
+                                      mimeType: "text/plain",
+                                      tokens: [{ value: bankInfoResponse }]
+                                  }
+                              }
+                          }
+                      }
+                  }
+              ]
+          }
+      };
+  
+  // Log successful response
+  logMessage(`Successfully processed request: ${JSON.stringify(ovonResponse)}`);
+
+      res.status(200).json(ovonResponse);
+  } catch (error) {
+      console.error('Error in /bankinfo:', error);
+      res.status(500).send('Internal Server Error');
+  }
+});
+
 
 // WEB SERVICES MANAGEMENT OpenAI Model (pro)
 
-const { askModelOpenAI, askModelOpenAIOrder } = require('./openai.js'); // OpenAI GPT-4 general and specilized on order models
+const { askModelOpenAI, askModelOpenAIOrder, askModelOpenAIBank } = require('./openai.js'); // OpenAI GPT-4 general and specilized on order models
 
 app.use(bodyParser.json());
 
@@ -1136,6 +1270,100 @@ app.post('/orderinfopro', apiKeyAuthSync, async (req, res) => {
       res.status(200).json(ovonResponse);
   } catch (error) {
       console.error('Error in /orderinfopro:', error);
+      res.status(500).send('Internal Server Error');
+  }
+});
+
+
+// BANK MNG RAG with OpenAI
+  
+async function processBankInfoRequest(request, useOpenAI = false) {
+  const bankData = await readBankFile();
+
+  if (bankData) {
+      const combinedInput = `${request.toString()}\n\n${bankData.toString()}`;
+
+      if (useOpenAI) {
+          const response = await askModelOpenAIBank(combinedInput);
+          return processOpenAIModelResponse(response);
+      } else {
+          const response = await askModel(combinedInput);
+          if (response && response.fullResponse) {
+              return processModelResponse(response.fullResponse, combinedInput);
+          } else {
+              console.error("Unexpected response format from Hugging Face model:", response);
+              return "Error: Unexpected response format.";
+          }
+      }
+  } else {
+      throw new Error('No bank data available');
+  }
+}
+
+app.post('/bankinfopro', apiKeyAuthSync, async (req, res) => {
+  try {
+      // Log the incoming request
+      logMessage(`Received POST request on /bankinfopro: ${JSON.stringify(req.body)}`);
+
+      // Extract the bankToken from the request
+      const bankToken = req.body.ovon.events.find(event => event.eventType === "utterance").parameters.dialogEvent.features.text.tokens[0];
+      const bankInfoRequestEncoded = bankToken && bankToken.value;
+
+      if (!bankInfoRequestEncoded) {
+          throw new Error('Bank information not found in the request');
+      }
+
+      const bankInfoRequest = decodeURIComponent(bankInfoRequestEncoded);
+      logMessage(`Decoded POST request: ${bankInfoRequest}`);
+
+      // Use OpenAI's model for this endpoint
+      const bankInfoResponse = await processBankInfoRequest(bankInfoRequest, true);
+
+      logMessage(`Process Info request: ${bankInfoResponse}`);
+
+      // Construct the response as per your original structure
+      const ovonResponse = {
+        ovon: {
+            schema: {
+                version: "0.9.0",
+                url: "https://openvoicenetwork.org/schema/dialog-envelope.json"
+            },
+            conversation: {
+                id: req.body.ovon.conversation.id
+            },
+            sender: {
+                from: "https://yourserver.com/bankinfopro"
+            },
+            responseCode: {
+                code: 200,
+                description: "OK"
+            },
+            events: [
+                {
+                    eventType: "bankInfoResponse",
+                    parameters: {
+                        dialogEvent: {
+                            speakerId: "assistant",
+                            span: {
+                                startTime: new Date().toISOString()
+                            },
+                            features: {
+                                text: {
+                                    mimeType: "text/plain",
+                                    tokens: [{ value: bankInfoResponse }]
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    };    
+
+      logMessage(`Successfully processed request for /bankinfopro: ${JSON.stringify(ovonResponse)}`);
+      res.status(200).json(ovonResponse);
+  } catch (error) {
+      console.error('Error in /bankinfopro:', error);
       res.status(500).send('Internal Server Error');
   }
 });
