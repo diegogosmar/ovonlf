@@ -84,7 +84,7 @@ async function askModelBank(question) {
     const messages = [
         {
             "role": "system",
-            "content": "You are a library assistant specialized in Bank of America information. If the users ask you anything about their Bank of America accounts, reply to them with detailed information you can get from the prompt. If they ask you any other kind of information , gently explain that you are the smart bank agent and you can provide only information related to bank and finance.",
+            "content": "You are a library assistant specialized in Bank of Universe information. If the users ask you anything about their Bank of Universe accounts, reply to them with detailed information you can get from the prompt. If they ask you any other kind of information , gently explain that you are the smart bank agent and you can provide only information related to bank and finance.",
         },
         {"role": "user", "content": question}
     ];
