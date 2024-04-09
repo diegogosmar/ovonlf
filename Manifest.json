@@ -1,0 +1,30 @@
+{
+    "identification":
+    {
+        "serviceEndpoint": "https://ovon.xcally.com/smartlibrary",
+        "organization": "XCALLY.ai",
+        "conversationalName": "smartlibrary",
+        "serviceName": "books and authors AI agent"
+    },
+
+    "capabilities": [
+        {
+            "keywords": [
+                "books",
+                "authors",
+                "ISBN",
+                "editors"
+            ],
+            "languages": [
+                "en-us"
+            ],
+            "descriptiveTexts": [
+                "Authors and Books information"
+            ],
+            "modalities": [
+                "text"
+            ],
+            "contentType": "application/json"
+        }
+    ]
+}
