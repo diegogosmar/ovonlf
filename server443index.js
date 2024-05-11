@@ -11,6 +11,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = 443;
 const https = require('https');
+const { handleRequestManifest } = require('./discovery'); // Adjust the path as necessary
 
 // Function to read API Key synchronously for Agent PRO usage
 function readApiKeySync() {
@@ -331,7 +332,7 @@ app.post('/sendAction', async (req, res) => {
 
 // WEB SERVICES MANAGEMENT Hugging_Face Model
 
-const { askModel } = require('./hugging_face'); // Adjust the path if necessary
+const { askModel } = require('./hugging_face.js'); // Adjust the path if necessary
 
 app.use(bodyParser.json());
 
@@ -420,8 +421,19 @@ const hasByeEventType = data => data.ovon.events.some(event => event.eventType =
 	const hasWhisperEventType = data.ovon.events.some(event => event.eventType === "whisper");
 	//console.log('Has Whisper:', hasWhisperEventType);
 
-    // Check if data.ovon.events contains the eventType named "utterance"
-    const hasUtteranceEventType = data.ovon.events.some(event => event.eventType === "utterance");
+  // New code: Check if there is a 'requestManifest' event
+  // console.log("Before checking for 'requestManifest'");
+  const hasRequestManifest = data.ovon.events.some(event => event.eventType === "requestManifest");
+  // console.log("After checking for 'requestManifest':", hasRequestManifest);
+  
+  if (hasRequestManifest) {
+      console.log("Handling requestManifest");
+      handleRequestManifest(req, res);
+      return; // Ensure no further processing is done for this request
+  }  
+
+  // Check if data.ovon.events contains the eventType named "utterance"
+  const hasUtteranceEventType = data.ovon.events.some(event => event.eventType === "utterance");
 	//console.log('Has Utterance:', hasUtteranceEventType);
 
 	  // Fetch data if ONLY the condition for WHISPER is met (intended for pure ISBN queries) 
@@ -768,7 +780,7 @@ app.post('/orderinfo', async (req, res) => {
 
 // BANK MNG section with RAG
 
-const { askModelBank } = require('./hugging_face');
+const { askModelBank } = require('./hugging_face.js');
 
 // Function to read from 'bank.txt'
 async function readBankFile() {
