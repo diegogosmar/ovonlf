@@ -6,7 +6,7 @@
         "conversationalName": "smartlibrary",
         "serviceName": "books and authors AI agent",
         "role": "Book Specialist",
-        "synopsis" : "AI agent specialist in providing Book and Authors information."
+        "synopsis" : "AI agent specialist in providing Book and Author information."
     },
 
     "capabilities": [
