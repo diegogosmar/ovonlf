@@ -4,9 +4,9 @@
         "serviceEndpoint": "https://ovon.xcally.com/smartlibrary",
         "organization": "XCALLY.ai",
         "conversationalName": "smartlibrary",
-        "serviceName": "books and authors AI agent",
+        "serviceName": "Books and Authors AI agent",
         "role": "Book Specialist",
-        "synopsis" : "AI agent specialist in providing Book and Author information."
+        "synopsis" : "AI agent specializing in providing information about books and authors."
     },
 
     "capabilities": [
