@@ -125,7 +125,7 @@ app.post('/sendAction', async (req, res) => {
         postData = {
             "ovon": {
                 "schema": {
-                  "version": "0.9.0",
+                  "version": "0.9.2",
                   "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
                 },
                 "conversation": {
@@ -155,7 +155,7 @@ app.post('/sendAction', async (req, res) => {
         postData = {
             "ovon": {
                 "schema": {
-                  "version": "0.9.0",
+                  "version": "0.9.2",
                   "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
                 },
                 "conversation": {
@@ -194,7 +194,7 @@ app.post('/sendAction', async (req, res) => {
         postData = {
             "ovon": {
                 "schema": {
-                  "version": "0.9.0",
+                  "version": "0.9.2",
                   "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
                 },
                 "conversation": {
@@ -239,7 +239,7 @@ app.post('/sendAction', async (req, res) => {
         postData = {
             "ovon": {
                 "schema": {
-                  "version": "0.9.0",
+                  "version": "0.9.2",
                   "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
                 },
                 "conversation": {
@@ -502,7 +502,7 @@ const hasByeEventType = data => data.ovon.events.some(event => event.eventType =
 			myJson = {
 				ovon: {
           schema: {
-            "version": "0.9.0",
+            "version": "0.9.2",
             "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
           },
 					conversation: {
@@ -540,7 +540,7 @@ const hasByeEventType = data => data.ovon.events.some(event => event.eventType =
 			myJson = {
 				ovon: {
           schema: {
-            "version": "0.9.0",
+            "version": "0.9.2",
             "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
           },
 					conversation: {
@@ -580,7 +580,7 @@ const hasByeEventType = data => data.ovon.events.some(event => event.eventType =
 				// Default JSON structure
 				ovon: {
           schema: {
-            "version": "0.9.0",
+            "version": "0.9.2",
             "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
           },
 					conversation: {
@@ -733,7 +733,7 @@ app.post('/orderinfo', async (req, res) => {
       const ovonResponse = {
           ovon: {
               schema: {
-                  version: "0.9.0",
+                  version: "0.9.2",
                   url: "https://openvoicenetwork.org/schema/dialog-envelope.json"
               },
               conversation: {
@@ -867,7 +867,7 @@ app.post('/bankinfo', async (req, res) => {
       const ovonResponse = {
           ovon: {
               schema: {
-                  version: "0.9.0",
+                  version: "0.9.2",
                   url: "https://openvoicenetwork.org/schema/dialog-envelope.json"
               },
               conversation: {
@@ -1019,7 +1019,7 @@ app.post('/smartagent', apiKeyAuthSync, async (req, res) => {
 myJson = {
   ovon: {
     schema: {
-      "version": "0.9.0",
+      "version": "0.9.2",
       "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
     },
     conversation: {
@@ -1057,7 +1057,7 @@ myJson = {
 myJson = {
   ovon: {
     schema: {
-      "version": "0.9.0",
+      "version": "0.9.2",
       "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
     },
     conversation: {
@@ -1098,7 +1098,7 @@ myJson = {
   // Default JSON structure
   ovon: {
     schema: {
-      "version": "0.9.0",
+      "version": "0.9.2",
       "url": "https://openvoicenetwork.org/schema/dialog-envelope.json"
     },
     conversation: {
@@ -1243,7 +1243,7 @@ app.post('/orderinfopro', apiKeyAuthSync, async (req, res) => {
       const ovonResponse = {
         ovon: {
             schema: {
-                version: "0.9.0",
+                version: "0.9.2",
                 url: "https://openvoicenetwork.org/schema/dialog-envelope.json"
             },
             conversation: {
@@ -1337,7 +1337,7 @@ app.post('/bankinfopro', apiKeyAuthSync, async (req, res) => {
       const ovonResponse = {
         ovon: {
             schema: {
-                version: "0.9.0",
+                version: "0.9.2",
                 url: "https://openvoicenetwork.org/schema/dialog-envelope.json"
             },
             conversation: {
