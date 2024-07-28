@@ -23,7 +23,8 @@ async function queryModelOpenAI(messages, apiKey) {
     };
 
     const data = {
-        model: 'gpt-4-1106-preview', // Replace with your chosen model ID
+        model: 'gpt-4o-mini', // Replace with your chosen model ID
+     //   model: 'gpt-4-1106-preview', // Replace with your chosen model ID
         messages: messages,
         temperature: 0.7,
         max_tokens: 100 // Max lenght of the response in tokens
