@@ -607,7 +607,7 @@ const hasByeEventType = data => data.ovon.events.some(event => event.eventType =
 								mimeType: "text/plain",
 								tokens: [
 								  {
-									value: "Hello from Socrates, your Smart Library service! I can look up information about books if you provide a valid ISBN number with a Whisper. If you prefer, you can also send me a Natural Language utterance and I'll reply you!"
+									value: "Hello from Athena, your Smart Library service! I can look up information about books if you provide a valid ISBN number with a Whisper. If you prefer, you can also send me a Natural Language utterance and I'll reply you!"
 								  }
 								]
 							  }
@@ -1125,7 +1125,7 @@ myJson = {
           mimeType: "text/plain",
           tokens: [
             {
-            value: "Hello from Socrated, your Smart Library service! I can look up information about books if you provide a valid ISBN number with a Whisper. If you prefer, you can also send me a Natural Language utterance and I'll reply you!"
+            value: "Hello from Athena, your Smart Library service! I can look up information about books if you provide a valid ISBN number with a Whisper. If you prefer, you can also send me a Natural Language utterance and I'll reply you!"
             }
           ]
           }
