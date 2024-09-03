@@ -587,7 +587,7 @@ const hasByeEventType = data => data.ovon.events.some(event => event.eventType =
 					  id: ovonConversationId
 					},
 					sender: {
-					  from: "https://ovon.xcally.com"
+					  from: "https://ovon.xcally.com/smartlibrary"
 					},
 					responseCode: {
             "code": 200,
@@ -1105,7 +1105,7 @@ myJson = {
       id: ovonConversationId
     },
     sender: {
-      from: "https://ovon.xcally.com"
+      from: "https://ovon.xcally.com/smartlibrary"
     },
     responseCode: {
       "code": 200,
