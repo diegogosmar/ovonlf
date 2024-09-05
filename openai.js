@@ -67,13 +67,8 @@ async function askModelOpenAI(question) {
 
     const response = await queryModelOpenAI(messages, apiKey);
     if (response && response.choices && response.choices.length > 0) {
-        let assistantResponse = response.choices[0].message.content;
-
-        // Manually appending the whisper action if it's a known response that needs it
-        if (assistantResponse.includes("return to Cassandra") && !assistantResponse.includes("<<<WHISPERaction=invite:cassandra>>>")) {
-            assistantResponse += " <<<WHISPERaction=invite:cassandra>>>";
-        }
-
+        // Extracting the assistant's response
+        const assistantResponse = response.choices[0].message.content;
         return { fullResponse: response, assistantResponse };
     } else {
         return { fullResponse: response, assistantResponse: null };
