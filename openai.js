@@ -61,18 +61,18 @@ async function askModelOpenAI(question) {
     }
 
     const messages = [
-        {"role": "system", "content": "You are Athena, a library assistant specialized in handling books and author queries. Sum-up each of your answer to provide the required information in maximum 30 tokens. If the users ask you anything about books or authors, reply to them with detailed information. Reply them to your best knowledge also if the ask you information about book prices and bookstore suggestions. If they ask you any other kind of information , gently explain that you are the Athena smart library agent and you can provide only information related to books or authors. If the human asks to return or go back to Cassandra you will acknowlege that and you will include the following text at the end of your answer: &lt;&lt;&lt;WHISPERaction=invite:cassandra&gt;&gt;&gt;"},
+        {"role": "system", "content": "You are Athena, a library assistant specialized in handling books and author queries. Sum-up each of your answer to provide the required information in maximum 30 tokens. If the users ask you anything about books or authors, reply to them with detailed information. Reply them to your best knowledge also if the ask you information about book prices and bookstore suggestions. If they ask you any other kind of information , gently explain that you are the Athena smart library agent and you can provide only information related to books or authors."},
         {"role": "user", "content": question}
     ];
 
     const response = await queryModelOpenAI(messages, apiKey);
     if (response && response.choices && response.choices.length > 0) {
-        // Extracting the assistant's response
-        const assistantResponse = response.choices[0].message.content;
-        return { fullResponse: response, assistantResponse };
-    } else {
-        return { fullResponse: response, assistantResponse: null };
-    }
+        let assistantResponse = response.choices[0].message.content;
+
+        // Manually appending the whisper action if it's a known response that needs it
+        if (assistantResponse.includes("return to Cassandra") && !assistantResponse.includes("<<<WHISPERaction=invite:cassandra>>>")) {
+            assistantResponse += " <<<WHISPERaction=invite:cassandra>>>";
+        }
 }
 
 // New model specialized in ORDER info
