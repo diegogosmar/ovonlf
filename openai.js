@@ -73,6 +73,11 @@ async function askModelOpenAI(question) {
         if (assistantResponse.includes("return to Cassandra") && !assistantResponse.includes("<<<WHISPERaction=invite:cassandra>>>")) {
             assistantResponse += " <<<WHISPERaction=invite:cassandra>>>";
         }
+
+        return { fullResponse: response, assistantResponse };
+    } else {
+        return { fullResponse: response, assistantResponse: null };
+    }
 }
 
 // New model specialized in ORDER info
